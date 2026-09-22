@@ -18,6 +18,5 @@ The next question is not about the Fibonacci sequence:
    message after the function returns that includes its return value.
 
    Test this on a recursive Fibonacci function (not one of the previous
-   iterator/generator ones!), since they can time to run for N around 30-40. Be
-   careful: we only want to see the time of the first function call, not every
-   function call.
+   iterator/generator ones!). Be careful: we only want to see the input/output
+   of the first function call, not every recursive call.

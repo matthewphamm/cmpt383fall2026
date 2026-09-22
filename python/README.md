@@ -1203,7 +1203,7 @@ def do_laundry():
     time.sleep(1)
     print("Laundry done")
 
-timed_do_laundry()
+do_laundry()
 # Doing laundry ... 
 # Laundry done
 # Time taken: 1.005068063735962 seconds
