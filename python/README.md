@@ -1051,7 +1051,7 @@ an infinite generator, since it never stops yielding prime numbers.
 Again, compared to the classes above that do the same thing, generator functions
 are generally simpler and more readable.
 
-## Closures and decorators
+## Closures and Decorators
 
 ### Closures
 
