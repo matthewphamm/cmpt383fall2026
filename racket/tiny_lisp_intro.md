@@ -556,3 +556,16 @@ Or:
 
 In practice, `lambda` functions are often a convenient way to create small
 functions, especially when a name doesn't matter.
+
+`(quote <expr>)` is a special form that returns the value of the expression
+without evaluating it. Usually we use the `'` shorthand for `quote`, but we can
+also write code like this:
+
+```lisp
+> (quote x)
+'x
+> (quote (1 2 3))
+'(1 2 3)
+> (quote (first '(a b c)))
+'(first '(a b c))
+```

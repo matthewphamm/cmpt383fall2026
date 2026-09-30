@@ -29,7 +29,9 @@ start with the line:
 
 ### Lecture 1,2 Racket: Basics
 
-- [Introduction to Racket](racket_intro.md)
+- [tiny-lisp introduction](tiny_lisp_intro.md)
+
+- (previously: [Introduction to Racket](racket_intro.md))
 
 
 ### Lecture 3 Racket: Lists, Symbols, and Recursion

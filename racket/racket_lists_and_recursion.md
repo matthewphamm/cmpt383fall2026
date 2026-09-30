@@ -92,7 +92,7 @@ The `rest` function returns everything on a list *except* for the first element:
   given: '()
 ```
 
-> **Aside** In the original version of [Lisp],  `car` was the name for `first`,
+> **Aside** In the original version of [Lisp], `car` was the name for `first`,
 > and `cdr` was the name for `rest`. These unusual names referred to the
 > underlying hardware of the original computer on which [Lisp] was originally
 > implemented.
@@ -239,16 +239,15 @@ is has the proper structure: `'(1 . (2 . ()))`.
 
 ### Garbage Collection
 
-`cons` *creates* a pair in [Racket], but how do you delete a pair that you don't
-want any more? [Racket] deletes it automatically using **garbage collection**,
-which means that it keeps track of which pairs are in use, and automatically
-deletes the ones that aren't.
+`cons` *creates* a pair in [Racket], but how do you *delete* a pair? [Racket]
+deletes it automatically using **garbage collection**, which means that it keeps
+track of which pairs are in use, and automatically deletes the ones that aren't.
 
 [Lisp] was one of the first languages to use garbage collection. While this
 makes managing memory much easier, it happens while your program is running, and
 so can slow your program down, or even pause it. Many of the computers that
 [Lisp] ran on in the 50s-80s were quite slow, and garbage collection pauses were
-noticeable and occurred at random times, and so it was often impractically slow.
+noticeable and occurred at random times, and so made it hard to use in practice.
 
 But nowadays, computers are much faster and have more memory, and so garbage
 collection is far more common. For example, Python, JavaScript, C#, and Go all
@@ -271,7 +270,6 @@ write our own. We want it to work like this:
 
 Lists do *not* store their own length, so we will need to calculate it using
 recursion.
-
 
 ```lisp
 (define (length lst)
@@ -307,6 +305,9 @@ returns `#t` if `x` is on the list, and `#f` if it's not:
         [else 
          (contains x (rest lst))]
         ))
+
+> (contains 'apple '(lemon orange apple pear))
+#t
 ```
 
 ## Challenge: linear search location
@@ -336,7 +337,8 @@ Using the `symbol?` function (which tests if an object is a symbol, such as
   (cond [(empty? lst) 0]
         [(symbol? (first lst)) 
          (+ 1 (count-sym1 (rest lst)))]
-        [else (count-sym1 (rest lst))]))
+        [else
+         (count-sym1 (rest lst))]))
 ```
 
 Now suppose we want to count *numbers* instead of symbols. We can modify
@@ -347,7 +349,8 @@ Now suppose we want to count *numbers* instead of symbols. We can modify
   (cond [(empty? lst) 0]
         [(number? (first lst))
          (+ 1 (count-num (rest lst)))]
-        [else (count-num (rest lst))]))
+        [else 
+         (count-num (rest lst))]))
 ```
 
 This is the same as `count-sym1`, except `number?` is used instead of `symbol?`,
@@ -363,11 +366,12 @@ returns either `#t` or `#f`:
   (cond [(empty? lst) 0]
         [(pred? (first lst))
          (+ 1 (count-fn pred? (rest lst)))]
-        [else (count-fn pred? (rest lst))]))
+        [else 
+         (count-fn pred? (rest lst))]))
 ```
 
 `pred?` names the passed-in predicate. [Racket] lets you use a `?` in a variable
-name, and a `?` at the end of a function is a convention that signals to the
+name, and a `?` at the end of a function is a convention that tells the
 programmer that it returns `#t` or `#f`.
 
 We can now count anything we have a predicate for:
@@ -424,7 +428,48 @@ We can re-write the original `contains` function for like this:
                lst))
 ```
 
-## More Examples of Recursive Functions
+## The append Function
+
+`append` takes two lists as input and returns a new list that i s the
+*concatenation* of them:
+
+```lisp
+> (append '(one two) '(3 4 5))
+'(one two 3 4 5)
+> (append '(once) '(upon a) '(time))
+'(once upon a time)
+```
+
+You can implement your own version of `append` using recursion:
+
+```lisp
+;;
+;; Appends two lists together, i.e. returns the same
+;; result as (append lst lst2).
+;;
+(define (append lst1 lst2)
+  (cond [(empty? lst1) 
+         lst2]
+        [else 
+         (cons (first lst1)
+               (append (rest lst1) lst2))]))
+```
+
+Note that [Racket] has a built-in `append` function that does the same thing,
+and even allows appending three our more lists at once. Our `append` is simple
+and only takes exactly two lists as input.
+
+A general rule of thumb is: `append` is expensive. The issue is that hides a
+linear-time copy of the first list you pass it. To run `(append a b)`, [Racket]
+*can't* simply make the last element of `a` point to `b` because the last
+element of `a` is an *immutable* pair. So it has to copy `a` and make the copies
+last element point to `b`.
+
+So `(append a b)` runs in linear time proportional to the length of `a`. Keep
+this in mind for the next function!
+
+
+## The reverse Function
 
 Lets write the `reverse` function, which reverses the order of a list's
 elements:
@@ -442,57 +487,52 @@ elements:
 '((in the world) cows the all)
 ```
 
-The recursive idea  is to reverse the *rest* of the list, and then append the
-first item to it:
+The recursive idea is to reverse the *rest* of the list, and then *append* the
+first item to the end of the reversed rest:
 
 ```lisp
-(define (rev lst)
+(define (reverse lst)
   (cond [(empty? lst) '()]
-        [else (append (rev (rest lst))
+        [else (append (reverse (rest lst))
                       (list (first lst)))]))
-                      
-> (rev '())
-'()
-> (rev '(a))
-'(a)
-> (rev '(a b))
-'(b a)
-> (rev '(a b c))
-'(c b a)
-> (rev '(all the cows (in the world)))
-'((in the world) cows the all)
 ```
 
-`append` takes 0 or more lists as input, and *concatenates* them, i.e. it
-returns a new list consisting of all the given lists combined into a single
-list:
+Conceptually, this words, but because it repeatedly calls `append` this runs in
+**quadratic time** with respect to the length of the list.
+
+We can speed this up by using an **accumulator** variable to store the reversed
+list as we go. Take a look at `reverse-helper`:
 
 ```lisp
-> (append '(1 2) '(3 4 5) '(6))
-'(1 2 3 4 5 6)
-> (append '(once) '(upon a) '(time))
-'(once upon a time)
+(define (reverse-helper lst acc)
+  (cond [(empty? lst)
+         acc]
+        [else
+         (reverse-helper (rest lst)
+                         (cons (first lst) acc))]
+        ))
 ```
 
-You can implement your own version of `append` using recursion:
+It takes two arguments: the `lst` we want to reverse, and `acc`, a helper list
+that will store the reversed list as we go. Each recursive call to
+`reverse-helper` removes the first element of `lst` and adds it to the front of
+`acc`. All the operations are constant-time, and so this reverse the list in
+linear time.
+
+For convenience, we can wrap `reverse-helper` in a new function called
+`my-reverse`:
 
 ```lisp
-;;
-;; Appends two lists together, i.e. returns the same
-;; result as (append lst lst2).
-;;
-(define (my-append lst1 lst2)
-  (cond [(empty? lst1) 
-         lst2]
-        [else 
-         (cons (first lst1)
-               (my-append (rest lst1) lst2))]))
-
-> (my-append '(1 2) '(3 4 5))
-'(1 2 3 4 5)
-> (my-append '(once there was a) '(a big house))
-'(once there was a big house)
+(define (my-reverse lst)
+  (reverse-helper lst '()))
 ```
+
+This trick of adding an extra accumulator variable is a common pattern in
+LISP-like languages, and [Racket] even has language features that support it.
+However, it puts the burden of recognizing the problem, and managing the
+accumulator, on the programmer.
+
+## More Examples of Recursive Functions
 
 In the following examples, **top-level** means the elements of the list are
 *not* nested within other lists:
@@ -540,22 +580,6 @@ In the following examples, **top-level** means the elements of the list are
 '(the dog gave the dog a hug)
 ```
 
-It's interesting to consider this alternate implementation of `replace`:
-
-```lisp
-(define (replace old new lst)
-  (if (empty? lst)
-      '()
-      (cons (if (equal? old (first lst)) new (first lst))
-            (replace old new (rest lst)))))
-```
-
-It's a little simpler because it doesn't repeat the call to `replace` and it
-gets rid of the `cond`. However, it no longer reads in sequential order. You are
-required to remember that the `if` is *inside* the `cons` function, and so you
-must remember that. That forces you to mentally keep track of the order of the
-operations, which for some programmers makes it harder to read.
-
 ## Challenge: subsets
 
 Implement a function called `(my-subset? lst1 lst2)` that returns true just when
@@ -579,8 +603,8 @@ For example:
 #t
 ```
 
-[Racket] already has a built-in function called `subset?`. Don't use `subset?`
-anywhere in your implementation of `my-subset?`.
+[Racket] already has a built-in function called `subset?`, but
+[tiny-lisp](tiny-lisp/README.md) does not.
 
 ## Challenge: set equality
 
@@ -707,15 +731,15 @@ recognize when an element is a list, and then count the numbers in it.
 ;; inside of lists:
 (define (deep-count-num lst)       
   (cond [(empty? lst) 
-           0]
+         0]
         [(list? (first lst))
-           (+ (deep-count-num (first lst)) 
-              (deep-count-num (rest lst)))]
+         (+ (deep-count-num (first lst)) 
+            (deep-count-num (rest lst)))]
         [(number? (first lst))
-           (+ 1 (deep-count-num (rest lst)))]
+         (+ 1 (deep-count-num (rest lst)))]
         [else
-           (deep-count-num (rest lst))]
-))
+         (deep-count-num (rest lst))]
+        ))
 ```
 
 There's one base case and are three recursive cases:
@@ -756,17 +780,17 @@ built-in [Racket] function `flatten` function does this:
 Here's an implementation of `flatten`:
 
 ```lisp
-(define (my-flatten x)
+(define (flatten x)
   (cond [(empty? x) 
            x]
         [(not (list? x)) 
            x]
         [(list? (first x))
-           (append (my-flatten (first x))
-                   (my-flatten (rest x)))]
+           (append (flatten (first x))
+                   (flatten (rest x)))]
         [else ;; first element is not a list
            (cons (first x) 
-                 (my-flatten (rest x)))]
+                 (flatten (rest x)))]
 ))
 ```
 
@@ -779,8 +803,7 @@ Using `flatten` we can re-write `deep-count-num` like this:
 
 As long as you know what `count-num` and `flatten` do, this implementation of
 `deep-count-num` is easier to read than the original version. It's a good
-example of how a more complicated functions can be built out of simpler
-functions, a common approach in functional programming.
+example of simpler functions can be used to build a more complicated function.
 
 
 ## Challenge: calculating consed-out lists
