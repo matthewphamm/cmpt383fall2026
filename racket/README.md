@@ -8,34 +8,30 @@ The [Racket problem set](Racket_problemset.md).
 
 Please use the [DrRacket IDE](https://racket-lang.org/).
 
-See [tiny-lisp](tiny-lisp/README.md) for more information on how to install and
-use the tiny-lisp language (a minimal Lisp with a small set of primitives).
+Many of the code examples are use the [tiny-lisp](tiny-lisp/README.md), which is
+a custom language that is a subset of Racket. See
+[tiny-lisp](tiny-lisp/README.md) for how to install and use it.
 
 ## Coding Style
 
-Racket supports many different languages, and we will be using only the core
-Racket language. You must put this line at the top of all your Racket source
-files:
+Racket supports many different languages, and we will mainly be using
+[tiny-lisp](tiny-lisp/README.md). [tiny-lisp](tiny-lisp/README.md) programs
+start with the line:
 
 ```lisp
-#lang racket
+#lang tiny-lisp
 
 ;; ... your Racket code ...
 ```
-
-While Racket/Scheme has loops, we are *not* going to be using them in our
-discussion of Racket. We will also *not* be using any mutating Racket functions.
-
-Instead we will focus on functional programming, a style of programming
-pioneered by LISP. This is good preparation for Haskell (the language we'll
-study after Racket), which does not allow loops or mutating functions.
 
 
 ## Racket Lectures
 
 ### Lecture 1,2 Racket: Basics
 
-- [Introduction to Racket](racket_intro.md)
+- [tiny-lisp introduction](tiny_lisp_intro.md)
+
+- (previously: [Introduction to Racket](racket_intro.md))
 
 
 ### Lecture 3 Racket: Lists, Symbols, and Recursion
