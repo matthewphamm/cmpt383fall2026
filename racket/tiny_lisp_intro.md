@@ -65,8 +65,8 @@ Tiny Lisp supports rational numbers, which are represented as fractions. For
 example, `1/2` is a rational number, one half:
 
 ```lisp
-> (+ 1/2 1/2)
-1/2
+> (+ 1/2 1/3)
+5/6
 > (* 1/2 1/2)
 1/4
 ```
@@ -123,7 +123,7 @@ For example:
 > (or #f #f)
 #f
 > (or (= 2 5) (< 4 10))
-#f
+#t
 
 > (not #t)
 #f
@@ -138,7 +138,7 @@ As with arithmetic operations, you can pass more than two operands to `and` and
 > (and #t #t #t)
 #t
 > (or #f #f #t #f)
-#f
+#t
 ```
 
 Importantly, `and` and `or` **short-circuit** operators, which means they work
@@ -147,7 +147,7 @@ like this:
 - `(and <expr1> <expr2> ...)` evaluates the expressions in order, left to right,
   and stops on the first expression that evaluates to `#f` and returns `#f` for
   the entire expression. It does *not* evaluate the expressions after the first
-  true one. If none of the expressions evaluate to `#f`, it returns `#t`.
+  false one. If none of the expressions evaluate to `#f`, it returns `#t`.
 
 - `(or <expr1> <expr2> ...)` evaluates the expressions in order, left to right,
   and stops on the first expression that evaluates to `#t` and returns `#t` for
@@ -158,14 +158,14 @@ For example, the expression `(error "oops!")` will raise an error, and this
 shows how short-circuiting works: 
 
 ```lisp
-> (and #t (error "oops!"))   ;; error not evaluated
+> (and #f (error "oops!"))   ;; error not evaluated
 #f
-> (or #f (error "oops!"))    ;; error not evaluated
+> (or #t (error "oops!"))    ;; error not evaluated
 #f
 
-> (and (error "oops!") #t)   ;; error evaluated
+> (and #f (error "oops!"))   ;; error evaluated
 . . oops!
-> (or #t (error "oops!"))    ;; error evaluated
+> (or #f (error "oops!"))    ;; error evaluated
 . . oops!
 ```
 
@@ -222,7 +222,7 @@ a number of useful built-in predicates.
 #t
 > (number? 4.0)
 #t
-> (number 4/5)
+> (number? 4/5)
 #t
 > (number? +)  ;; + is a function
 #f
@@ -261,7 +261,7 @@ number, and `#f` otherwise:
 > (symbol? 'cat)
 #t
 > (symbol? 'dog)
-#f
+#t
 > (symbol? 4)
 #f
 ```
@@ -417,7 +417,9 @@ function, where each `<expr>` is an expression:
 #f
 ```
 
-A pair is a fundamental date type in Tiny Lisp. As the name suggests, a pair holds two values and is literal form is written as `(<value1> . <value2>)`. For example, `(1 . 2)` is a pair, and so is `(1 . (2 . 3 . ()))`:
+A pair is a fundamental date type in Tiny Lisp. As the name suggests, a pair
+holds two values and is literal form is written as `(<value1> . <value2>)`. For
+example, `(1 . 2)` is a pair, and so is `(1 . (2 . (3 . ())))`:
 
 ```lisp
 > (pair? '(1 . (2 . (3 . ()))))
@@ -493,7 +495,6 @@ less than 0, `'positive` if `n` is greater than 0, and `'zero` if `n` is 0. If
 'zero
 > (sign 'cat)
 . . not a number
-oops!
 ```
 
 Each `<test>` is an expression of the form `[<cond> <value>]`, where `<cond>` is
@@ -514,7 +515,7 @@ could replace the `else` with `#t`.
 
 ```lisp
 > (let [(x 1) (y 2)] (+ x y))
-2
+3
 ```
 
 The general form of `let` is:
@@ -659,7 +660,7 @@ idea is similar to `sum`, but with a different base case and operator:
 ```lisp
 (define (product L)
   (cond [(empty? L) 1]
-        [else (+ (first L)
+        [else (* (first L)
                  (product (rest L)))]
         ))
 
@@ -801,7 +802,7 @@ is at index 1, etc. The recursive implementation idea is:
 Be careful: `(nth n L)` runs in `O(n)` time, so it is not efficient to use for
 large lists.
 
-### remove an element from a list
+### remove all occurrences of an element from a list
 
 `(remove x L)` returns a new list with *all* occurrences of `x` removed from
 list `L`. The recursive idea is:
@@ -862,7 +863,7 @@ It's is instructive to trace how a call to `append` works:
 ```
 
 This shows that the running time of `append` is proportional to the length of
-`L`. So if `L` has `n` elements, `append` takes `O(n)` time.
+`A`. So if `A` has `n` elements, `append` takes `O(n)` time.
 
 This is important: `append` is a linear-time operation. If you call `append`
 repeatedly, you can end up with a quadratic-time operation. As we will see,
@@ -1038,7 +1039,7 @@ We can also use an accumulator to speed up the `sum` function:
 Here's a trace:
 
 ```
-(sum '(4 5 6))
+(sum2 '(4 5 6))
 = (sum-acc '(4 5 6) 0)
 = (sum-acc '(5 6)   4)
 = (sum-acc '(6)     9)
