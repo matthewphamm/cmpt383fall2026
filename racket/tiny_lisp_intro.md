@@ -163,7 +163,7 @@ shows how short-circuiting works:
 > (or #t (error "oops!"))    ;; error not evaluated
 #f
 
-> (and #f (error "oops!"))   ;; error evaluated
+> (and #t (error "oops!"))   ;; error evaluated
 . . oops!
 > (or #f (error "oops!"))    ;; error evaluated
 . . oops!
