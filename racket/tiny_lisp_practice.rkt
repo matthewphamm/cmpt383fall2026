@@ -64,6 +64,15 @@
 (define (sorted? L)
   'todo)
 
+;;
+;; Problem 5
+;;
+;; (range n) returns the list (0 1 2 ... n-1). Assume n is a
+;; non-negative integer.
+;;
+(define (range n)
+  'todo)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -107,3 +116,9 @@
 (check '(sorted? '(-3 -1 0 1/2))     (sorted? '(-3 -1 0 1/2))     #t)
 (check '(sorted? '(3 1 2))           (sorted? '(3 1 2))           #f)
 (check '(sorted? '(1 2 3 0))         (sorted? '(1 2 3 0))         #f)
+
+;; Problem 5: range
+(check '(range 0)                    (range 0)                    '())
+(check '(range 1)                    (range 1)                    '(0))
+(check '(range 2)                    (range 2)                    '(0 1))
+(check '(range 5)                    (range 5)                    '(0 1 2 3 4))

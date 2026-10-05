@@ -99,6 +99,20 @@ list and lists with one element are sorted.
 #f
 ```
 
+## Problem 5: range
+
+`(range n)` returns the list of integers from 0 up to, but not including, `n`.
+You can assume `n` is a non-negative integer.
+
+```lisp
+> (range 0)
+'()
+> (range 1)
+'(0)
+> (range 5)
+'(0 1 2 3 4)
+```
+
 ## When You're Done
 
 Submit your finished file to your Canvas TA group so that others can see your
