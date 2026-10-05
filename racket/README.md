@@ -31,6 +31,9 @@ start with the line:
 
 - [tiny-lisp introduction](tiny_lisp_intro.md)
 
+- [tiny-lisp practice](tiny_lisp_practice.md); Racket starter file:
+  [tiny_lisp_practice.rkt](tiny_lisp_practice.rkt)
+
 - (previously: [Introduction to Racket](racket_intro.md))
 
 
