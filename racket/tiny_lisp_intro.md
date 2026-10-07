@@ -10,6 +10,8 @@ Here are it's main features:
 
 - arithmetic operators: `+`, `-`, `*`, `/`, `<=`, `>=`, `<`, `>`, `=`
 
+- mathematical functions: `sqrt`, `sin`, `cos`
+
 - logical operators: `and`, `or`, `not`
 
 - error handling: `error` for raising errors
@@ -163,7 +165,7 @@ shows how short-circuiting works:
 > (or #t (error "oops!"))    ;; error not evaluated
 #f
 
-> (and #f (error "oops!"))   ;; error evaluated
+> (and #t (error "oops!"))   ;; error evaluated
 . . oops!
 > (or #f (error "oops!"))    ;; error evaluated
 . . oops!
@@ -602,7 +604,7 @@ also write code like this:
 ## Functions to Know
 
 The following functions are all useful for working with lists, and are good
-practioce for writing recursive functions in LISP.
+practice for writing recursive functions in LISP.
 
 ### length of a list
 
