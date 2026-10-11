@@ -1473,18 +1473,229 @@ The folding function for `filter` is a little more complex. It checks if the
 accumulated values. If it does not, it skips the element and keeps the
 accumulated values as is.
 
-### deep-count of a list
-
-Coming soon!
-
 ### flatten a list
 
-Coming soon!
+`(flatten L)`returns a new list with all internal lists removed, but the
+non-list elements kept as they are in the order they appear in the original
+list.
+
+For example:
+
+- `(flatten '((a) ((c d (e f)) g) h))` evaluates to `'(a c d e f g h)`
+- `(flatten '(define (x y) (+ x y)))` evaluates to `(define x y + x y)`
+
+A recursive idea for implementing `flatten` is:
+
+- return an empty list if `L` is empty
+
+- if the first element of `L` is a list, return the result of flatten that first
+  element, and append to the flattened rest of the list
+
+- otherwise, make a new list with the first element of `L` followed by the
+  flattened rest of the list
+
+```lisp
+(define (flatten L)
+  (cond [(empty? L)
+         '()]
+        [(list? (first L))
+         (append (flatten (first L))
+                 (flatten (rest L)))]
+        [else
+         (cons (first L)
+               (flatten (rest L)))]))
+
+> (flatten '((1 2) (3 4) 5))
+'(1 2 3 4 5)
+> (flatten '(define (x y) (+ x y)))
+'(define x y + x y)
+```
+
+Note that this implementation repeats `(first L)` and `(rest L)` a couple of
+times. This does not slow the down (since the repeats are different `cond`
+clauses), but it does, arguably, make the code less readable.
+
+So here is an alternative implementation that uses `let*` to avoid the
+repetition:
+
+```lisp
+(define (flatten L)
+  (cond [(empty? L)
+         '()]
+        [else
+         (let* [(head (first L))
+                (tail (rest L))
+                (flat-tail (flatten tail))]
+           (cond [(list? head)
+                  (append (flatten head) flat-tail)]
+                 [else
+                  (cons head flat-tail)]))]))
+```
+
+It might be easier for many programmers to see the structure of the code here.
+
+Another idea for implementing `flatten` is to use a right fold. The basic idea
+is:
+
+```lisp
+(define (flatten L)
+  (foldr (lambda (next acc)
+           ???
+         )
+         '() ;; the initial accumulated value
+         L))
+```
+
+What should the folding function be? It should examine `next`. If it *is* a
+list, it should recursively flatten it, and then append it to the accumulated
+value. If `next` is *not* a list, it should just put it unchanged onto the
+accumulated value:
+
+```lisp
+(define (flatten L)
+  (foldr (lambda (next acc)
+           (cond [(list? next)
+                  (append (flatten next) acc)]
+                 [else
+                  (cons next acc)]))
+         '()
+         L))
+```
+
+## deep functions
+
+A **deep function** is a function that operates on a list, and can contain nested
+lists.
+
+For example, `(deep-sum L)` returns the sum of all the numbers in the list,
+including the numbers in the nested lists. For example, `(deep-sum '((1 ((2)) 3)
+(4 5) 6))` evaluates to 21.
+
+An idea for implementing `deep-sum` is to flatten the list and then use a
+regular the regular shallow `sum` function we've already defined:
+
+```lisp
+(define (deep-sum L)
+  (sum (flatten L)))
+```
+
+This works because `(flatten L)` returns a list of all the numbers in the list,
+including the numbers in the nested lists. Then `(foldr + 0 (flatten L))`
+returns the sum of all the numbers in the list.
+
+Another example is `(deep-member? x L)`, which returns `#t` if `x` is found in
+the list, including in the nested lists. For example, `(deep-member? 2 '((1
+((2)) 3) (4 5) 6))` evaluates to `#t`.
+
+Again, it can be implemented using `flatten` and the regular shallow `member?`
+function:
+
+```lisp
+(define (deep-member? x L)
+  (member? x (flatten L)))
+```
+
+Not all deep functions can implemented using `flatten`. For example, `(deep-map
+f L)` returns a new list with `f` applied to each element of the list, including
+the elements in the nested lists. Importantly, `deep-map` preserves the nested
+structure of the list.
+
+For example, `(deep-map square '((1 2) (3 4) 5))` evaluates to `'((1 4) (9 16)
+25)`.
+
+An idea for implementing `deep-map` is to use a right fold. The idea is that
+each next new item in the list is either a list of a non-list. If it is a list,
+it should be deep-mapped and put onto the front of the accumulated value. If it
+is a non-list, it should be `f` applied to it and put onto the front of the
+accumulated value.
+
+```lisp
+(define (deep-map f L)
+  (foldr (lambda (next acc)
+           (cons (cond [(list? next)
+                        (deep-map f next)]
+                       [else
+                        (f next)])
+                 acc))
+         '()
+         L))
+
+> (deep-map (lambda (n) (* n n))
+            '(1 ((2 3) 4) ((5))))
+'(1 ((4 9) 16) ((25)))
+```
 
 ### insertion sort
 
-Coming soon!
+Recall that **insertion sort** is an elementary sorting algorithm that builds
+sorts a list of numbers by scanning through the list and inserting each number
+in the correct position in a new list. 
+
+Insertion sort can be implemented using a right fold. Each new number in the
+list is insertion into the correction position of the accumulated list (which is
+in sorted order) using a helper function `insert-sorted`:
+
+```lisp
+(define (insertion-sort L)
+  (foldr insert-sorted '() L))
+```
+
+For this to work we need to write `(insert-sorted x L)`, where `L` is in sorted
+order. It returns a new list with `x` inserted into the correct position, e.g.:
+
+```
+(insert-sorted 3 '(1 2 4 5))
+'(1 2 3 4 5)
+```
+
+A recursive idea for implementing `insert-sorted` is:
+
+- return a list with `x` if `L` is empty
+- if `x` is less than or equal to the first element of `L`, insert `x` at the
+  front of `L`
+- otherwise, insert `x` at the front of the rest of `L` and `cons` the first
+  element of `L` back onto the front of the result
+
+Here is an implementation of `insert-sorted`:
+
+```lisp
+(define (insert-sorted x L)
+  (cond [(empty? L)
+         (list x)]
+        [(<= x (first L))
+         (cons x L)]
+        [else
+         (cons (first L)
+               (insert-sorted x (rest L)))]))
+```
 
 ### quicksort with filter
 
-Coming soon!
+**Quicksort** is another fundamental sorting algorithm that works by selecting a
+*pivot* element, partitioning the list into two sublists around that pivot,
+recursively sorting the two sublists, and then combining the results into a
+single sorted list.
+
+Here is an implementation of quicksort that chooses the first element of the
+list as the pivot:
+
+```lisp
+(define (quicksort L)
+  (cond [(<= (length L) 1)
+         L]
+        [else
+         (let* [(pivot (first L))
+                (smalls (filter (lambda (n) (< n pivot))
+                                (rest L)))
+                (bigs (filter (lambda (n) (>= n pivot))
+                              (rest L)))
+                ]
+           (concat (list (quicksort smalls)
+                         (list pivot)
+                         (quicksort bigs))))]))
+
+> (quicksort '(9 3 2 0 8 7 3))
+'(0 2 3 3 7 8 9)
+```
+
+Recall that `concat` appends a list of lists into a single list.

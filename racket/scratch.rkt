@@ -80,13 +80,13 @@
                  (map fn (rest L)))]))
 
 #;(define (filter pred? L)
-  (cond [(empty? L)
-         '()]
-        [(pred? (first L))
-         (cons (first L)
-               (filter pred? (rest L)))]
-        [else
-         (filter pred? (rest L))]))
+    (cond [(empty? L)
+           '()]
+          [(pred? (first L))
+           (cons (first L)
+                 (filter pred? (rest L)))]
+          [else
+           (filter pred? (rest L))]))
 
 #;(define (all pred? L)
     (cond [(empty? L)
@@ -127,7 +127,91 @@
 
 (define (filter pred? L)
   (foldr (lambda (next acc)
-           (cond [(pred? next) (cons next acc)]
-                 [else acc]))
+           (cond [(pred? next)
+                  (cons next acc)]
+                 [else
+                  acc]))
          '()
          L))
+
+#;(define (flatten L)
+    (cond [(empty? L)
+           '()]
+          [(list? (first L))
+           (append (flatten (first L))
+                   (flatten (rest L)))]
+          [else
+           (cons (first L)
+                 (flatten (rest L)))]))
+
+#;(define (flatten L)
+    (cond [(empty? L)
+           '()]
+          [else
+           (let* [(head (first L))
+                  (tail (rest L))
+                  (flat-tail (flatten tail))]
+             (cond [(list? head)
+                    (append (flatten head)
+                            flat-tail)]
+                   [else
+                    (cons head flat-tail)]))]))
+
+
+(define (flatten L)
+  (foldr (lambda (next acc)
+           (cond [(list? next)
+                  (append (flatten next) acc)]
+                 [else
+                  (cons next acc)]))
+         '()
+         L))
+
+
+(define (deep-sum L)
+  (foldr + 0 (flatten L)))
+
+(define (deep-map f L)
+  (foldr (lambda (x acc)
+           (cons (cond [(list? x)
+                        (deep-map f x)]
+                       [else
+                        (f x)])
+                 acc))
+         '()
+         L))
+
+(define (insert-sorted x L)
+  (cond [(empty? L)
+         (list x)]
+        [(<= x (first L))
+         (cons x L)]
+        [else
+         (cons (first L)
+               (insert-sorted x (rest L)))]))
+
+(define (insertion-sort L)
+  (foldr insert-sorted '() L))
+
+(define (concat list-of-lists)
+  (cond [(empty? list-of-lists)
+         '()]
+        [else
+         (append (first list-of-lists)
+                 (concat (rest list-of-lists)))]
+        ))
+
+(define (quicksort L)
+  (cond [(<= (length L) 1)
+         L]
+        [else
+         (let* [(pivot (first L))
+                (smalls (filter (lambda (n) (< n pivot))
+                                (rest L)))
+                (bigs (filter (lambda (n) (>= n pivot))
+                              (rest L)))
+                ]
+           (concat (list (quicksort smalls)
+                         (list pivot)
+                         (quicksort bigs))))]))
+
