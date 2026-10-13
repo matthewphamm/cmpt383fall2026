@@ -33,7 +33,13 @@
 ;; integers L.
 ;;
 (define (count-evens L)
-  'todo)
+  (cond [(empty? L)
+         0]
+        [(even? (first L))
+         (+ 1 (count-evens (rest L)))]
+        [else
+         (count-evens (rest L))]
+        ))
 
 ;;
 ;; Problem 2
@@ -41,8 +47,22 @@
 ;; (max-of L) returns the largest number in the list L. If L is empty,
 ;; it raises an error.
 ;;
+(define (max-of-helper L largest)
+  (cond [(empty? L)
+         largest]
+        [(> (first L) largest)
+         (max-of-helper (rest L) (first L))]
+        [else
+         (max-of-helper (rest L) largest)]
+        ))
+
+
 (define (max-of L)
-  'todo)
+  (cond [(empty? L)
+         (error "empty list")]
+        [else
+         (max-of-helper (rest L) (first L))]
+        ))
 
 ;;
 ;; Problem 3
@@ -51,8 +71,22 @@
 ;; corresponding elements of A and B. If one list is longer than the
 ;; other, the extra elements are ignored.
 ;;
+;; Idea: - use length as helper function?
+;;       - iterate up to the shortest length list
+;;       - use a zip helper function to keep track of index
+  
+        
+  
+
+
+
 (define (zip A B)
-  'todo)
+  (cond [(or (empty? A) (empty? B))
+         '()]
+        [else
+         (cons (list (first A) (first B)) (zip (rest A) (rest B)))]
+        ))
+    
 
 ;;
 ;; Problem 4
@@ -61,8 +95,27 @@
 ;; (duplicates are allowed), and #f otherwise. The empty list and lists
 ;; with one element are sorted.
 ;;
+;; Idea: - returns true on empty list and one element list
+;;       - use helper function to remember first and second elements to compare
+;;       - recursively go through the entire list if first <= second
+
+(define (sorted-helper x L)
+  (cond [(empty? L)
+         #t]
+        [(<= x (first L))
+         (sorted-helper (first L) (rest L))]
+        [else
+         #f]))
+
+
+
 (define (sorted? L)
-  'todo)
+  (cond [(empty? L)
+         #t]
+        [else
+         (sorted-helper (first L) (rest L))]
+        ))
+
 
 ;;
 ;; Problem 5
@@ -70,8 +123,17 @@
 ;; (range n) returns the list (0 1 2 ... n-1). Assume n is a
 ;; non-negative integer.
 ;;
+(define (range-helper i n)
+  (cond [(not (number? n))
+         (error "Not an integer")]
+        [(>= i n)
+         '()]
+        [else
+         (cons i (range-helper (+ i 1) n))]
+        ))
+
 (define (range n)
-  'todo)
+  (range-helper 0 n))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
