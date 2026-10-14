@@ -1698,4 +1698,5 @@ list as the pivot:
 '(0 2 3 3 7 8 9)
 ```
 
-Recall that `concat` appends a list of lists into a single list.
+Recall that `concat` appends a list of lists into a single list, e.g.
+`(concat '((1 2 5) (7) (8 10)))` evaluates to `'(1 2 5 7 8 10)`.
