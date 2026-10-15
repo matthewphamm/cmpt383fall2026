@@ -765,8 +765,8 @@ recursive idea is:
 . . last: empty list
 > (last '(call for bubble gum))
 'gum
-> (last '(the big brown dog (at an apple)))
-'(at an apple)
+> (last '(the big brown dog (ate an apple)))
+'(ate an apple)
 ```
 
 ### nth element
@@ -823,12 +823,14 @@ list `L`. The recursive idea is:
          (cons (first L) (remove-all x (rest L)))]
         ))
 
-> (remove-all 'cat '())
-'()
-> (remove-all 'cat '(cat))
-'()
 > (remove-all 'dust '(dirt dust dust dirt (dirt dust)))
 '(dirt dirt (dirt dust))
+
+> (remove-all 'cat '())
+'()
+
+> (remove-all 'cat '(cat cat mouse cat))
+'(mouse)
 ```
 
 ### append two lists
@@ -875,7 +877,10 @@ quadratic-time because of this.
 ### append all lists in a list
 
 `(concat list-of-lists)` returns a new list that is the concatenation of all the
-lists in `list-of-lists`. The recursive idea is:
+lists in `list-of-lists`. For example, `(concat '((1) (two three four) (five) (6
+7)))` evaluates to `'(1 two three four five 6 7)`.
+
+The recursive idea is:
 
 - return an empty list if `list-of-lists` is empty
 - otherwise, append the first list of `list-of-lists` to the result of 
@@ -894,7 +899,6 @@ lists in `list-of-lists`. The recursive idea is:
 '(1 2 three four five six 7 8)
 > (concat (list '(a b c) '() '(d e (f) g)))
 '(a b c d e (f) g)
-> 
 ```
 
 While `concat` is a common name for this function, it is also known as `append*`
@@ -923,6 +927,8 @@ recursive idea is:
 '(c b a)
 > (reverse '(1 2 3 4 5))
 '(5 4 3 2 1)
+> (reverse '(this (is a) (big test)))
+'((big test) (is a) this)
 ```
 
 Unfortunately, this version of `reverse` is a **quadratic-time operation**.
@@ -1022,7 +1028,9 @@ Compare this to a trace of the original `length` function:
 = 3
 ```
 
-`length` and `length2` both have about the same running time, but `length2` is more space-efficient because it doesn't need to build up the list `(+ 1 (+ 1 (+ 1 ...)))`.
+`length` and `length2` both have about the same running time, but `length2` is
+more space-efficient because it doesn't need to build up the list 
+`(+ 1 (+ 1 (+ 1 ...)))`.
 
 We can also use an accumulator to speed up the `sum` function:
 
@@ -1103,20 +1111,21 @@ is proportional to the length of `L`. If `fn` is a constant-time operation, then
 `map` is a linear-time operation. If `fn` is a linear-time operation, then `map`
 is a quadratic-time operation.
 
-`map` is quite useful in practice, and most modern programming languages have a
-`map` function in some form. For example, in Python list comprehensions are a
-form of `map`:
+`map` is quite useful in practice, and most modern programming languages have it
+in some form. For example, in Python list comprehensions provide a form of `map`:
 
 ```
 Python:
 [x * x for x in [1, 2, 3]]
+= [1, 4, 9]
 
 Lisp:
 (map (lambda (x) (* x x)) '(1 2 3))
+= '(1 4 9)
 ```
 
-Note that  `(map fn L)` always returns a list that is the same length as the
-list `L`. `map` cannot increase or decrease the length of the list.
+Note that `(map fn L)` always returns a list that is the same length as the list
+`L`. `map` cannot increase or decrease the length of the list.
 
 ### filter a list
 
@@ -1153,7 +1162,20 @@ is proportional to the length of `L`. If `pred?` is a constant-time operation,
 then `filter` is a linear-time operation. If `pred?` is a linear-time operation,
 then `filter` is a quadratic-time operation.
 
-In practice, `filter` is quite useful and goes together well with `map`. For example, Python's list comprehensions are a form of `filter` and `map`:
+Recall `(remove-all x L)` from before: it returns a new list that is the same as
+`L` but with all occurrences of `x` removed. We can implement it using `filter`:
+
+```lisp
+(define (remove-all x L)
+  (filter (lambda (y) (not (equal? y x))) 
+          L))
+```
+
+Intuitively, this says to keep the elements of all that are *not* equal to `x`.
+
+In practice, `filter` is quite useful and goes together well with `map`. For
+example, Python's list comprehensions are a form of `filter` and `map`:
+
 ```
 Python:
 [x * x for x in [1, 2, 3, 4, 5] 
@@ -1166,13 +1188,12 @@ Lisp:
 
 ### all
 
-`(all pred? L)` returns `#t` if all the elements of `L` satisfy the predicate.
-Or, a little more precisely, `(all pred? L)` returns `#t` just when there is no
-element in `L` that makes `pred?` return `#f`. 
+`(all pred? L)` returns `#t` if all the elements of `L` satisfy the predicate
+(i.e. make it true). Or, a little more precisely, `(all pred? L)` returns `#t`
+just when there is no element in `L` makes `pred?` return `#f`. 
 
-`pred?` is a boolean predication function that takes one input and returns `#t`
-or `#f`, while `L` is a list of 0 or more elements that `pred?` can be applied
-to.
+`pred?` is a boolean predicate function that takes one input and returns `#t` or
+`#f`, while `L` is a list of 0 or more elements that `pred?` can be applied to.
 
 For example, `(all even? '(2 4 6))` returns `#t`, and `(all symbol? '(two 4
 five))` returns `#f`.
@@ -1200,10 +1221,10 @@ is proportional to the length of `L`. If `pred?` is a constant-time operation,
 then `all` is a linear-time operation. If `pred?` is a linear-time operation,
 then `all` is a quadratic-time operation.
 
-There is another way to implement `all` using `filter`. The idea is to filter on
-the elements that *don't* satisfy `pred?`. If that filtered list is length 0,
-then all the elements of `L` satisfy `pred?`. Otherwise, some element of `L`
-does not satisfy `pred?`, and so `all` returns `#f`:
+Another way to implement `all` is to use `filter`. The idea is to remove the
+elements that *don't* satisfy `pred?`. If that filtered list is length 0, then
+all the elements of `L` satisfy `pred?`. Otherwise, some element of `L` does not
+satisfy `pred?`, and so `all` returns `#f`:
 
 ```lisp
 (define (all pred? L)
@@ -1215,18 +1236,18 @@ Unfortunately, this implementation is often slower than the recursive version.
 The recursive version ends as soon as `pred?` returns `#f`: there is no reason
 to keep checking once we know that the result is `#f`. 
 
-However, the `filter` version always calls `pred?` on all the elements of `L`,
-even if the very first element makes `pred?` return `#f`.
+But the `filter` version always calls `pred?` on all the elements of `L`, even
+if the very first element makes `pred?` return `#f`.
 
-Yet, despite it's slowness, the `filter` version is interesting because it is
-doesn't explicitly use recursion, and is instead built-up from simpler
-operations. For many programmers, it is easier to understand and reason about
-than the recursive version.
+Despite it's slowness, the `filter` version is interesting because it is doesn't
+explicitly use recursion, and is instead built-up from simpler operations. For
+many programmers, it is easier to understand and reason about than the recursive
+version.
 
 ### folding a list
 
 **Folding** a list is a powerful technique that we'll introduce through an
-example. Consider the list `'(a b c d)`. We can write i ast a series of nested
+example. Consider the list `'(a b c d)`. We can write it as a series of nested
 calls to `cons`:
 
 ```
@@ -1244,9 +1265,9 @@ Notice a few things:
 
 - the second parameter for the last `cons` is the empty list `'()`
 
-Now imagine generalization the cons-ed out form to work with *any* binary
-function (on values that make sense for it). For instance, imagine replacing
-`cons` with `+`:
+Now imagine generalizing the cons-ed out form to work with a binary function (on
+values that make sense for it) other than `cons`. For instance, imagine
+replacing `cons` with `+`:
 
 ```
 (+ 1 (+ 2 (+ 3 (+ 4 0))))
@@ -1268,7 +1289,7 @@ Notice again that last value passed to the last `*`: it is 1, because that makes
 sense for multiplication.
 
 Now lets generalize this. Suppose you have a list of elements `'(a b c d)`, a
-binary operator `op` that works those list values, and also we have the final
+binary operator `op` that works on those values, and also we have the final
 value `init` for the last call to `op`. Then we can calculate the folded form of
 the list like this:
 
@@ -1302,8 +1323,10 @@ To write `(foldr op init L)`, we can use this recursive idea:
 
 > (foldr + 0 '(1 2 3 4))
 10
+
 > (foldr * 1 '(1 2 3 4))
 24
+
 > (foldr - 0 '(1 2 3 4))
 -2
 ```
@@ -1320,7 +1343,8 @@ We can implement `(sum L)` as a right fold:
 10
 ```
 
-It is useful to trace a function call. Imagine calling `(sum '(1 2 3 4))`, and evaluating it step by step:
+It is useful to trace a function call. Imagine calling `(sum '(1 2 3 4))`, and
+evaluating it step by step:
 
 ```
 (sum '(1 2 3 4))
@@ -1351,8 +1375,10 @@ The `(length L)` function can be written like this:
 
 > (length '())
 0
+
 > (length '(a))
 1
+
 > (length '(a b c d))
 4
 ```
@@ -1368,8 +1394,7 @@ Calling `(foldr op 0 '(a b c))` gives this:
 = (op a (op b (op c 0)))
 ```
 
-`op` is `(lambda (next acc) (+ acc 1))`, so we we do one step of evaluation we
-get:
+`op` is `(lambda (next acc) (+ acc 1))`, so doing one step of evaluation gives:
 
 ```
 (foldr op 0 '(a b c))
@@ -1377,8 +1402,8 @@ get:
 = (op a (op b (+ 0 1)))
 ```
 
-The `c` disappears because the body of `op` adds 1 to the accumulated value.
-Continuing this process, the calls to `op` are evaluated in the usual way:
+The `c` disappears because the body of `op` ignores it. Continuing this process,
+the calls to `op` are evaluated in the usual way:
 
 ```
 (foldr op 0 '(a b c))
@@ -1473,9 +1498,9 @@ The folding function for `filter` is a little more complex. It checks if the
 accumulated values. If it does not, it skips the element and keeps the
 accumulated values as is.
 
-### flatten a list
+### flattening a list
 
-`(flatten L)`returns a new list with all internal lists removed, but the
+`(flatten L)`returns a new list with all internal sub-lists removed, but the
 non-list elements kept as they are in the order they appear in the original
 list.
 
@@ -1507,13 +1532,14 @@ A recursive idea for implementing `flatten` is:
 
 > (flatten '((1 2) (3 4) 5))
 '(1 2 3 4 5)
+
 > (flatten '(define (x y) (+ x y)))
 '(define x y + x y)
 ```
 
 Note that this implementation repeats `(first L)` and `(rest L)` a couple of
-times. This does not slow the down (since the repeats are different `cond`
-clauses), but it does, arguably, make the code less readable.
+times. This does not slow the function down (because the repeats are different
+`cond` clauses), but it does, arguably, make the code less readable.
 
 So here is an alternative implementation that uses `let*` to avoid the
 repetition:
@@ -1532,10 +1558,11 @@ repetition:
                   (cons head flat-tail)]))]))
 ```
 
-It might be easier for many programmers to see the structure of the code here.
+It might be easier for some programmers to see the structure of the code in this
+version.
 
-Another idea for implementing `flatten` is to use a right fold. The basic idea
-is:
+Another idea for implementing `flatten` is to use a right fold. The basic
+structure would be:
 
 ```lisp
 (define (flatten L)
@@ -1564,15 +1591,15 @@ accumulated value:
 
 ## deep functions
 
-A **deep function** is a function that operates on a list, and can contain nested
-lists.
+A **deep function** is a function that operates on a list, and goes into nested
+sub-lists.
 
 For example, `(deep-sum L)` returns the sum of all the numbers in the list,
 including the numbers in the nested lists. For example, `(deep-sum '((1 ((2)) 3)
 (4 5) 6))` evaluates to 21.
 
-An idea for implementing `deep-sum` is to flatten the list and then use a
-regular the regular shallow `sum` function we've already defined:
+An idea for implementing `deep-sum` is to flatten the list and then use a the
+regular shallow `sum` function we've already defined:
 
 ```lisp
 (define (deep-sum L)
@@ -1584,7 +1611,7 @@ including the numbers in the nested lists. Then `(foldr + 0 (flatten L))`
 returns the sum of all the numbers in the list.
 
 Another example is `(deep-member? x L)`, which returns `#t` if `x` is found in
-the list, including in the nested lists. For example, `(deep-member? 2 '((1
+the list, including in any nested sub-lists. For example, `(deep-member? 2 '((1
 ((2)) 3) (4 5) 6))` evaluates to `#t`.
 
 Again, it can be implemented using `flatten` and the regular shallow `member?`
@@ -1627,32 +1654,36 @@ accumulated value.
 
 ### insertion sort
 
-Recall that **insertion sort** is an elementary sorting algorithm that builds
-sorts a list of numbers by scanning through the list and inserting each number
-in the correct position in a new list. 
+Recall that **insertion sort** is a sorting algorithm that builds a sorted list
+of numbers by taking numbers from the input list and inserting them in the
+correct sorted position in a new list. 
 
 Insertion sort can be implemented using a right fold. Each new number in the
-list is insertion into the correction position of the accumulated list (which is
+list is inserted into the correction position of the accumulated list (which is
 in sorted order) using a helper function `insert-sorted`:
 
 ```lisp
 (define (insertion-sort L)
   (foldr insert-sorted '() L))
+
+> (insertion-sort '(3 1 4 2 5))
+'(1 2 3 4 5)
 ```
 
 For this to work we need to write `(insert-sorted x L)`, where `L` is in sorted
-order. It returns a new list with `x` inserted into the correct position, e.g.:
+order. It returns a new list with `x` inserted into the correct position in `L`,
+e.g.:
 
 ```
-(insert-sorted 3 '(1 2 4 5))
+> (insert-sorted 3 '(1 2 4 5))
 '(1 2 3 4 5)
 ```
 
 A recursive idea for implementing `insert-sorted` is:
 
-- return a list with `x` if `L` is empty
+- if `L` is empty, return a list with just `x` in it
 - if `x` is less than or equal to the first element of `L`, insert `x` at the
-  front of `L`
+  front of `L` using `cons`
 - otherwise, insert `x` at the front of the rest of `L` and `cons` the first
   element of `L` back onto the front of the result
 
@@ -1669,12 +1700,13 @@ Here is an implementation of `insert-sorted`:
                (insert-sorted x (rest L)))]))
 ```
 
+Now `(foldr insert-sorted '() L))` returns a copy of `L` in sorted order.
+
 ### quicksort with filter
 
-**Quicksort** is another fundamental sorting algorithm that works by selecting a
-*pivot* element, partitioning the list into two sublists around that pivot,
-recursively sorting the two sublists, and then combining the results into a
-single sorted list.
+**Quicksort** is another` sorting algorithm that works by selecting a *pivot*
+element, partitioning the list into two sub-lists around that pivot, and
+recursively sorting the two sub-lists.
 
 Here is an implementation of quicksort that chooses the first element of the
 list as the pivot:
