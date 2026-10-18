@@ -147,11 +147,6 @@
          (cons (first L)
                (remove-all x (rest L)))]))
 
-
-
-
-
-
 ;;
 ;; (append A B)
 ;; returns a new list consisting of all the elements of A
@@ -175,12 +170,6 @@
         ))
 
 
-
-
-
-
-
-
 ;;
 ;; (concat list-of-lists)
 ;; returns a new list that consist of all the elements of the
@@ -197,16 +186,9 @@
   (cond [(empty? list-of-lists)
          '()]
         [else
-         (cons (first list-of-lists)
-               (concat (rest list-of-lists)))]
+         (append (first list-of-lists)
+                 (concat (rest list-of-lists)))]
         ))
-
-(define (identity x)
-  x)
-
-
-
-
 
 ;;
 ;; (reverse L)

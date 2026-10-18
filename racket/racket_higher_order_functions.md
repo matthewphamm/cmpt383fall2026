@@ -69,7 +69,6 @@ should avoid using `eval` in most situations.
 > a few elementary [Racket] functions. Such a function is called a
 > **meta-circular interpreter**.
 
-
 ## Closures
 
 A **closure** combines two things: a function, and an environment of `(variable
