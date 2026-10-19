@@ -23,18 +23,21 @@ start with the line:
 
 ;; ... your Racket code ...
 ```
+## Racket Notes
 
+[tiny-lisp introduction](tiny_lisp_intro.md): basics of Tiny Lisp, and all the
+other Lisp topics for the course.
 
-## Racket Lectures
+[tiny-lisp practice](tiny_lisp_practice.md); Racket starter file:
+[tiny_lisp_practice.rkt](tiny_lisp_practice.rkt)
+
+---
+Old Lecture Notes (from previous semesters)
+---
 
 ### Lecture 1,2 Racket: Basics
 
-- [tiny-lisp introduction](tiny_lisp_intro.md)
-
-- [tiny-lisp practice](tiny_lisp_practice.md); Racket starter file:
-  [tiny_lisp_practice.rkt](tiny_lisp_practice.rkt)
-
-- (previously: [Introduction to Racket](racket_intro.md))
+- [Introduction to Racket](racket_intro.md)
 
 
 ### Lecture 3 Racket: Lists, Symbols, and Recursion

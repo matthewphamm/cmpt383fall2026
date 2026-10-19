@@ -765,8 +765,8 @@ recursive idea is:
 . . last: empty list
 > (last '(call for bubble gum))
 'gum
-> (last '(the big brown dog (at an apple)))
-'(at an apple)
+> (last '(the big brown dog (ate an apple)))
+'(ate an apple)
 ```
 
 ### nth element
@@ -823,12 +823,14 @@ list `L`. The recursive idea is:
          (cons (first L) (remove-all x (rest L)))]
         ))
 
-> (remove-all 'cat '())
-'()
-> (remove-all 'cat '(cat))
-'()
 > (remove-all 'dust '(dirt dust dust dirt (dirt dust)))
 '(dirt dirt (dirt dust))
+
+> (remove-all 'cat '())
+'()
+
+> (remove-all 'cat '(cat cat mouse cat))
+'(mouse)
 ```
 
 ### append two lists
@@ -875,7 +877,10 @@ quadratic-time because of this.
 ### append all lists in a list
 
 `(concat list-of-lists)` returns a new list that is the concatenation of all the
-lists in `list-of-lists`. The recursive idea is:
+lists in `list-of-lists`. For example, `(concat '((1) (two three four) (five) (6
+7)))` evaluates to `'(1 two three four five 6 7)`.
+
+The recursive idea is:
 
 - return an empty list if `list-of-lists` is empty
 - otherwise, append the first list of `list-of-lists` to the result of 
@@ -894,7 +899,6 @@ lists in `list-of-lists`. The recursive idea is:
 '(1 2 three four five six 7 8)
 > (concat (list '(a b c) '() '(d e (f) g)))
 '(a b c d e (f) g)
-> 
 ```
 
 While `concat` is a common name for this function, it is also known as `append*`
@@ -923,6 +927,8 @@ recursive idea is:
 '(c b a)
 > (reverse '(1 2 3 4 5))
 '(5 4 3 2 1)
+> (reverse '(this (is a) (big test)))
+'((big test) (is a) this)
 ```
 
 Unfortunately, this version of `reverse` is a **quadratic-time operation**.
@@ -944,7 +950,7 @@ quadratic.
 
 ### reverse a list with an accumulator
 
-`(reverse-acc L)` returns a new list that is the reverse of the list `L`. It
+`(reverse-acc L acc)` returns a new list that is the reverse of the list `L`. It
 does it using an accumulator, which lets it run in linear time. The idea of an
 accumulator is to keep track of the result as we go so that we don't have to
 call `append` repeatedly.
@@ -1022,7 +1028,9 @@ Compare this to a trace of the original `length` function:
 = 3
 ```
 
-`length` and `length2` both have about the same running time, but `length2` is more space-efficient because it doesn't need to build up the list `(+ 1 (+ 1 (+ 1 ...)))`.
+`length` and `length2` both have about the same running time, but `length2` is
+more space-efficient because it doesn't need to build up the list 
+`(+ 1 (+ 1 (+ 1 ...)))`.
 
 We can also use an accumulator to speed up the `sum` function:
 
@@ -1103,20 +1111,21 @@ is proportional to the length of `L`. If `fn` is a constant-time operation, then
 `map` is a linear-time operation. If `fn` is a linear-time operation, then `map`
 is a quadratic-time operation.
 
-`map` is quite useful in practice, and most modern programming languages have a
-`map` function in some form. For example, in Python list comprehensions are a
-form of `map`:
+`map` is quite useful in practice, and most modern programming languages have it
+in some form. For example, in Python list comprehensions provide a form of `map`:
 
 ```
 Python:
 [x * x for x in [1, 2, 3]]
+= [1, 4, 9]
 
 Lisp:
 (map (lambda (x) (* x x)) '(1 2 3))
+= '(1 4 9)
 ```
 
-Note that  `(map fn L)` always returns a list that is the same length as the
-list `L`. `map` cannot increase or decrease the length of the list.
+Note that `(map fn L)` always returns a list that is the same length as the list
+`L`. `map` cannot increase or decrease the length of the list.
 
 ### filter a list
 
@@ -1153,7 +1162,20 @@ is proportional to the length of `L`. If `pred?` is a constant-time operation,
 then `filter` is a linear-time operation. If `pred?` is a linear-time operation,
 then `filter` is a quadratic-time operation.
 
-In practice, `filter` is quite useful and goes together well with `map`. For example, Python's list comprehensions are a form of `filter` and `map`:
+Recall `(remove-all x L)` from before: it returns a new list that is the same as
+`L` but with all occurrences of `x` removed. We can implement it using `filter`:
+
+```lisp
+(define (remove-all x L)
+  (filter (lambda (y) (not (equal? y x))) 
+          L))
+```
+
+Intuitively, this says to keep the elements of all that are *not* equal to `x`.
+
+In practice, `filter` is quite useful and goes together well with `map`. For
+example, Python's list comprehensions are a form of `filter` and `map`:
+
 ```
 Python:
 [x * x for x in [1, 2, 3, 4, 5] 
@@ -1166,13 +1188,12 @@ Lisp:
 
 ### all
 
-`(all pred? L)` returns `#t` if all the elements of `L` satisfy the predicate.
-Or, a little more precisely, `(all pred? L)` returns `#t` just when there is no
-element in `L` that makes `pred?` return `#f`. 
+`(all pred? L)` returns `#t` if all the elements of `L` satisfy the predicate
+(i.e. make it true). Or, a little more precisely, `(all pred? L)` returns `#t`
+just when there is no element in `L` makes `pred?` return `#f`. 
 
-`pred?` is a boolean predication function that takes one input and returns `#t`
-or `#f`, while `L` is a list of 0 or more elements that `pred?` can be applied
-to.
+`pred?` is a boolean predicate function that takes one input and returns `#t` or
+`#f`, while `L` is a list of 0 or more elements that `pred?` can be applied to.
 
 For example, `(all even? '(2 4 6))` returns `#t`, and `(all symbol? '(two 4
 five))` returns `#f`.
@@ -1200,10 +1221,10 @@ is proportional to the length of `L`. If `pred?` is a constant-time operation,
 then `all` is a linear-time operation. If `pred?` is a linear-time operation,
 then `all` is a quadratic-time operation.
 
-There is another way to implement `all` using `filter`. The idea is to filter on
-the elements that *don't* satisfy `pred?`. If that filtered list is length 0,
-then all the elements of `L` satisfy `pred?`. Otherwise, some element of `L`
-does not satisfy `pred?`, and so `all` returns `#f`:
+Another way to implement `all` is to use `filter`. The idea is to remove the
+elements that *don't* satisfy `pred?`. If that filtered list is length 0, then
+all the elements of `L` satisfy `pred?`. Otherwise, some element of `L` does not
+satisfy `pred?`, and so `all` returns `#f`:
 
 ```lisp
 (define (all pred? L)
@@ -1215,18 +1236,18 @@ Unfortunately, this implementation is often slower than the recursive version.
 The recursive version ends as soon as `pred?` returns `#f`: there is no reason
 to keep checking once we know that the result is `#f`. 
 
-However, the `filter` version always calls `pred?` on all the elements of `L`,
-even if the very first element makes `pred?` return `#f`.
+But the `filter` version always calls `pred?` on all the elements of `L`, even
+if the very first element makes `pred?` return `#f`.
 
-Yet, despite it's slowness, the `filter` version is interesting because it is
-doesn't explicitly use recursion, and is instead built-up from simpler
-operations. For many programmers, it is easier to understand and reason about
-than the recursive version.
+Despite it's slowness, the `filter` version is interesting because it is doesn't
+explicitly use recursion, and is instead built-up from simpler operations. For
+many programmers, it is easier to understand and reason about than the recursive
+version.
 
 ### folding a list
 
 **Folding** a list is a powerful technique that we'll introduce through an
-example. Consider the list `'(a b c d)`. We can write i ast a series of nested
+example. Consider the list `'(a b c d)`. We can write it as a series of nested
 calls to `cons`:
 
 ```
@@ -1244,9 +1265,9 @@ Notice a few things:
 
 - the second parameter for the last `cons` is the empty list `'()`
 
-Now imagine generalization the cons-ed out form to work with *any* binary
-function (on values that make sense for it). For instance, imagine replacing
-`cons` with `+`:
+Now imagine generalizing the cons-ed out form to work with a binary function (on
+values that make sense for it) other than `cons`. For instance, imagine
+replacing `cons` with `+`:
 
 ```
 (+ 1 (+ 2 (+ 3 (+ 4 0))))
@@ -1268,7 +1289,7 @@ Notice again that last value passed to the last `*`: it is 1, because that makes
 sense for multiplication.
 
 Now lets generalize this. Suppose you have a list of elements `'(a b c d)`, a
-binary operator `op` that works those list values, and also we have the final
+binary operator `op` that works on those values, and also we have the final
 value `init` for the last call to `op`. Then we can calculate the folded form of
 the list like this:
 
@@ -1302,8 +1323,10 @@ To write `(foldr op init L)`, we can use this recursive idea:
 
 > (foldr + 0 '(1 2 3 4))
 10
+
 > (foldr * 1 '(1 2 3 4))
 24
+
 > (foldr - 0 '(1 2 3 4))
 -2
 ```
@@ -1320,7 +1343,8 @@ We can implement `(sum L)` as a right fold:
 10
 ```
 
-It is useful to trace a function call. Imagine calling `(sum '(1 2 3 4))`, and evaluating it step by step:
+It is useful to trace a function call. Imagine calling `(sum '(1 2 3 4))`, and
+evaluating it step by step:
 
 ```
 (sum '(1 2 3 4))
@@ -1351,8 +1375,10 @@ The `(length L)` function can be written like this:
 
 > (length '())
 0
+
 > (length '(a))
 1
+
 > (length '(a b c d))
 4
 ```
@@ -1368,8 +1394,7 @@ Calling `(foldr op 0 '(a b c))` gives this:
 = (op a (op b (op c 0)))
 ```
 
-`op` is `(lambda (next acc) (+ acc 1))`, so we we do one step of evaluation we
-get:
+`op` is `(lambda (next acc) (+ acc 1))`, so doing one step of evaluation gives:
 
 ```
 (foldr op 0 '(a b c))
@@ -1377,8 +1402,8 @@ get:
 = (op a (op b (+ 0 1)))
 ```
 
-The `c` disappears because the body of `op` adds 1 to the accumulated value.
-Continuing this process, the calls to `op` are evaluated in the usual way:
+The `c` disappears because the body of `op` ignores it. Continuing this process,
+the calls to `op` are evaluated in the usual way:
 
 ```
 (foldr op 0 '(a b c))
@@ -1393,10 +1418,10 @@ Continuing this process, the calls to `op` are evaluated in the usual way:
 
 ### member has a right fold
 
-The `(member x L)` function can be written like this:
+The `(member? x L)` function can be written like this:
 
 ```lisp
-(define (member x L)
+(define (member? x L)
   (foldr (lambda (next acc) (or (eq? next x) acc))
          #f
          L))
@@ -1473,9 +1498,9 @@ The folding function for `filter` is a little more complex. It checks if the
 accumulated values. If it does not, it skips the element and keeps the
 accumulated values as is.
 
-### flatten a list
+### flattening a list
 
-`(flatten L)`returns a new list with all internal lists removed, but the
+`(flatten L)` returns a new list with all internal sub-lists removed, but the
 non-list elements kept as they are in the order they appear in the original
 list.
 
@@ -1507,13 +1532,14 @@ A recursive idea for implementing `flatten` is:
 
 > (flatten '((1 2) (3 4) 5))
 '(1 2 3 4 5)
+
 > (flatten '(define (x y) (+ x y)))
 '(define x y + x y)
 ```
 
 Note that this implementation repeats `(first L)` and `(rest L)` a couple of
-times. This does not slow the down (since the repeats are different `cond`
-clauses), but it does, arguably, make the code less readable.
+times. This does not slow the function down (because the repeats are different
+`cond` clauses), but it does, arguably, make the code less readable.
 
 So here is an alternative implementation that uses `let*` to avoid the
 repetition:
@@ -1532,10 +1558,11 @@ repetition:
                   (cons head flat-tail)]))]))
 ```
 
-It might be easier for many programmers to see the structure of the code here.
+It might be easier for some programmers to see the structure of the code in this
+version.
 
-Another idea for implementing `flatten` is to use a right fold. The basic idea
-is:
+Another idea for implementing `flatten` is to use a right fold. The basic
+structure would be:
 
 ```lisp
 (define (flatten L)
@@ -1562,17 +1589,98 @@ accumulated value:
          L))
 ```
 
+## insertion sort
+
+Recall that **insertion sort** is a sorting algorithm that builds a sorted list
+of numbers by taking numbers from the input list and inserting them in the
+correct sorted position in a new list. 
+
+Insertion sort can be implemented using a right fold. Each new number in the
+list is inserted into the correction position of the accumulated list (which is
+in sorted order) using a helper function `insert-sorted`:
+
+```lisp
+(define (insertion-sort L)
+  (foldr insert-sorted '() L))
+
+> (insertion-sort '(3 1 4 2 5))
+'(1 2 3 4 5)
+```
+
+For this to work we need to write `(insert-sorted x L)`, where `L` is in sorted
+order. It returns a new list with `x` inserted into the correct position in `L`,
+e.g.:
+
+```
+> (insert-sorted 3 '(1 2 4 5))
+'(1 2 3 4 5)
+```
+
+A recursive idea for implementing `insert-sorted` is:
+
+- if `L` is empty, return a list with just `x` in it
+- if `x` is less than or equal to the first element of `L`, insert `x` at the
+  front of `L` using `cons`
+- otherwise, insert `x` at the front of the rest of `L` and `cons` the first
+  element of `L` back onto the front of the result
+
+Here is an implementation of `insert-sorted`:
+
+```lisp
+(define (insert-sorted x L)
+  (cond [(empty? L)
+         (list x)]
+        [(<= x (first L))
+         (cons x L)]
+        [else
+         (cons (first L)
+               (insert-sorted x (rest L)))]))
+```
+
+Now `(foldr insert-sorted '() L))` returns a copy of `L` in sorted order.
+
+## quicksort with filter
+
+**Quicksort** is another` sorting algorithm that works by selecting a *pivot*
+element, partitioning the list into two sub-lists around that pivot, and
+recursively sorting the two sub-lists.
+
+Here is an implementation of quicksort that chooses the first element of the
+list as the pivot:
+
+```lisp
+(define (quicksort L)
+  (cond [(<= (length L) 1)
+         L]
+        [else
+         (let* [(pivot (first L))
+                (smalls (filter (lambda (n) (< n pivot))
+                                (rest L)))
+                (bigs (filter (lambda (n) (>= n pivot))
+                              (rest L)))
+                ]
+           (concat (list (quicksort smalls)
+                         (list pivot)
+                         (quicksort bigs))))]))
+
+> (quicksort '(9 3 2 0 8 7 3))
+'(0 2 3 3 7 8 9)
+```
+
+Recall that `concat` appends a list of lists into a single list, e.g.
+`(concat '((1 2 5) (7) (8 10)))` evaluates to `'(1 2 5 7 8 10)`.
+
 ## deep functions
 
-A **deep function** is a function that operates on a list, and can contain nested
-lists.
+A **deep function** is a function that operates on a list, and goes into nested
+sub-lists.
 
 For example, `(deep-sum L)` returns the sum of all the numbers in the list,
 including the numbers in the nested lists. For example, `(deep-sum '((1 ((2)) 3)
 (4 5) 6))` evaluates to 21.
 
-An idea for implementing `deep-sum` is to flatten the list and then use a
-regular the regular shallow `sum` function we've already defined:
+An idea for implementing `deep-sum` is to flatten the list and then use a the
+regular shallow `sum` function we've already defined:
 
 ```lisp
 (define (deep-sum L)
@@ -1584,7 +1692,7 @@ including the numbers in the nested lists. Then `(foldr + 0 (flatten L))`
 returns the sum of all the numbers in the list.
 
 Another example is `(deep-member? x L)`, which returns `#t` if `x` is found in
-the list, including in the nested lists. For example, `(deep-member? 2 '((1
+the list, including in any nested sub-lists. For example, `(deep-member? 2 '((1
 ((2)) 3) (4 5) 6))` evaluates to `#t`.
 
 Again, it can be implemented using `flatten` and the regular shallow `member?`
@@ -1625,78 +1733,769 @@ accumulated value.
 '(1 ((4 9) 16) ((25)))
 ```
 
-### insertion sort
+## Closures
 
-Recall that **insertion sort** is an elementary sorting algorithm that builds
-sorts a list of numbers by scanning through the list and inserting each number
-in the correct position in a new list. 
+A **closure** combines two things: a function, and an environment of variables
+and their values. The function can use variables from this environment.
 
-Insertion sort can be implemented using a right fold. Each new number in the
-list is insertion into the correction position of the accumulated list (which is
-in sorted order) using a helper function `insert-sorted`:
+For example, this function, but *not* a closure:
 
 ```lisp
-(define (insertion-sort L)
-  (foldr insert-sorted '() L))
+(define (f n)     ;; f is a function, but not a closure
+        (+ n 1))
+
+> (f 5)
+6
 ```
 
-For this to work we need to write `(insert-sorted x L)`, where `L` is in sorted
-order. It returns a new list with `x` inserted into the correct position, e.g.:
-
-```
-(insert-sorted 3 '(1 2 4 5))
-'(1 2 3 4 5)
-```
-
-A recursive idea for implementing `insert-sorted` is:
-
-- return a list with `x` if `L` is empty
-- if `x` is less than or equal to the first element of `L`, insert `x` at the
-  front of `L`
-- otherwise, insert `x` at the front of the rest of `L` and `cons` the first
-  element of `L` back onto the front of the result
-
-Here is an implementation of `insert-sorted`:
+Now consider this one:
 
 ```lisp
-(define (insert-sorted x L)
-  (cond [(empty? L)
-         (list x)]
-        [(<= x (first L))
-         (cons x L)]
+(define (make-adder n)
+    (lambda (x) (+ n x))   ;; n is outside the lambda function
+)
+
+(define g (make-adder 1))  ;; g is a closure
+
+> (g 5)
+6
+```
+
+`g` is a closure because it has both a function and a binding for the variable
+`n`. By itself, the function `(lambda (x) (+ n x))` can't be evaluated because
+variable `n` is *free*. But, in `g`, `n` is bound to the value 1. The function
+plus this binding of `n` is a closure.
+
+Conceptually, you can think of a closure as being a **let over lambda**:
+
+```lisp
+(define g1
+    (let ([n 1])
+        (lambda (x)
+            (+ n x))
+    )
+)
+
+> (g1 5)
+6
+```
+
+`g1` is not *just* a function, but a function along with variable bindings that
+it can use.
+
+**Free variables** are variables that appear in a function but aren't declared
+in the function. For example, `n` is free in `(lambda (x) (+ n x))`. Any
+programming language that lets you define functions inside functions must decide
+how to handle free variables. Closures are a common solution to this problem.
+Another is to simply disallow returning functions with free variables, but this
+reduces the flexibility of returning functions.
+
+## Composing Functions
+
+Recall how **function composition** works in mathematics. Suppose you have these
+two functions:
+
+$$
+\begin{align*}
+f(x) &= x^2 \\
+g(x) &= 2x + 1
+\end{align*}
+$$
+
+The composition of $f$ and $g$ is:
+
+$$
+\begin{align*}
+f(g(x)) &= g(x)^2 \\
+        &= (2x + 1)^2 \\
+        &= 4x^2 + 4x + 1
+\end{align*}
+$$
+
+$\circ$ is the function composition operator:
+
+$$
+\begin{align*}
+(f \circ g)(x) &= (2x + 1)^2 \\
+               &= 4x^2 + 4x +1
+\end{align*}
+$$
+
+In code, we can compose functions directly by calling them:
+
+```lisp
+(define (f x) (* x x))
+(define (g x) (+ (* 2 x) 1))
+
+;; h composes f and g
+(define (h x) (f (g x)))
+
+> (f 2)
+4
+> (g 2)
+5
+> (f (g 2))
+25
+> (h 2)
+25
+```
+
+We can also compose functions *without* without an explicit variable. The `comp`
+function takes two single-input functions as input and returns their a function
+that is their composition:
+
+```lisp
+(define (comp f g)
+    (lambda (x) (f (g x))))
+```
+
+The idea is that `(comp f g)` returns a function that first applies `g` to its
+input, and then applies `f` to the result of that, i.e. it does `g` and then
+`f`.
+
+This lets us define `h` from above without explicitly using `x`:
+
+```lisp
+(define h (comp f g))
+
+> (h 2)
+25
+```
+
+Here's a function that returns the second element of a list:
+
+```lisp
+(define my-second (comp first rest))
+
+> (my-second '(big red apple))
+'red
+```
+
+We call `(my-second lst)`, but the `lst` parameter does *not* appear in the
+definition of `my-second`: it is *implicit*.
+
+The `twice` function takes a function, `f`, as input and returns `f` composed
+with itself, i.e. $f \circ f$:
+
+```lisp
+(define (twice f) (comp f f))
+```
+
+For instance:
+
+```lisp
+(define garnish 
+    (twice (lambda (x) (cons 'cheese x)))
+)
+
+> (garnish '(sauce crust))
+(cheese cheese sauce crust)
+```
+
+## Composing Multiple Functions
+
+[Racket]'s built-in `compose` function lets you compose 2 or more functions, but
+it is not part of Tiny Lisp. So lets implement our own version called
+`(compose-all f1 f2 ... fn)` that returns the composition of `f1` to `fn`, i.e.
+`(f1 (f2 ... (fn x)))`.
+
+To write this function, suppose we have three functions `h`, `g`, and `f`, each
+of which takes 1 input and returns 1 output. Using the $\circ$ operator, we can
+write the composition of all three as $h \circ g \circ f$, which is the same as
+$h \circ (g \circ f)$. This has the structure of a right fold. 
+
+Recall that right fold is `(foldr op init lst)`. What would be `init` for
+composition? In others, what should `init` be in 
+`(comp f (comp g (comp h init)))`?
+
+The answer is the **identity function**, i.e. the function that returns whatever
+you pass it. We could write it as $I(x) = x$, and so for example, $f \circ I =
+f$, e.g. $(f \circ I)(x) = f(I(x)) = f(x)$.
+
+Now we can write `compose-all` as a right fold:
+
+```lisp
+(define (compose-all fns)
+  (foldr comp
+         (lambda (x) x)   ;; identity function
+         fns))
+```
+
+Here's an example of how this works:
+
+```lisp
+(define (f x) (append x (list 'f)))
+(define (g x) (append x (list 'g)))
+(define (h x) (append x (list 'h)))
+
+(define fgh (compose-all (list f g h)))
+
+> (seq1 '(test))
+`(test h g f)
+```
+
+This shows that the functions are applied in *reverse* order, which most humans
+find counter-intuitive. So lets write a variation of `compose-all` that applies
+the functions in the order they are given:
+
+```lisp
+(define (pipeline fns)
+  (compose-all (reverse fns)))
+```
+
+This lets us write the functions in the order they're applied:
+
+```lisp
+(define seq2 (pipeline f g h))
+
+> (seq2 '(test))
+'(test f g h)
+```
+
+## Curried Functions
+
+The idea of **currying** is to treat a function that takes more than 1 input as
+a series of functions that take 1 input each.
+
+Here are two different ways to write the addition function:
+
+```lisp
+(define add_a          ;; uncurried
+    (lambda (x y)
+        (+ x y)))
+
+> (add_a 3 4)
+7
+
+(define add_b          ;; curried
+    (lambda (x)
+        (lambda (y)
+            (+ x y))))
+
+> ((add_b 3) 4)
+7
+```
+
+`add_a` takes two inputs, and immediately returns an answer. `add_b` takes only
+one input and returns a function. This returned function takes the second input
+and returns the sum of the two inputs.
+
+The nice thing about `add_b` is that if we give it only a single input `n`, we
+get a useful function:
+
+```lisp
+(define add5 (add_b 5))
+```
+
+In Tiny Lisp, most functions are *not* written in a curried style. We can write
+a function that converts a non-curried function into a curried one:
+
+```lisp
+;; assumes f is a 2-parameter uncurried function;
+;; returns a curried version of f
+(define (curry2 f)
+  (lambda (x)
+    (lambda (y)
+      (f x y))))
+```
+
+For example:
+
+```lisp
+(define add5 ((curry2 +) 5))
+
+> (add5 3)
+8
+```
+
+`+` is a pre-defined 2-argument function, and so `(curry2 +)` is equivalent to
+this:
+
+```lisp
+(lambda (x)    ;; curried version of +
+  (lambda (y)
+    (+ x y)))
+```
+
+Thus `((curry2 +) 5)` is this:
+
+```lisp
+(lambda (y)
+  (+ 5 y))
+```
+
+Here's a another example. Recall that `(filter pred? lst)` returns a new list
+containing just the elements of `lst` that satisfy the predicate `pred?`:
+
+```lisp
+> (filter odd? '(1 2 3 4 5))
+'(1 3 5)
+```
+
+We could write a curried version like this:
+
+```lisp
+(define keep-odds ((curry2 filter) odd?))
+
+> (keep-odds '(1 2 3 4 5))
+(1 3 5)
+```
+
+Any function that takes 2 inputs can be curried. For example:
+
+```lisp
+;; curried versions of some standard functions
+(define c_+ (curry2 +))
+(define c_cons (curry2 cons))
+(define c_filter (curry2 filter))
+
+;; some definitions that use curried functions
+(define inc (c_+ 1))
+(define f (c_filter odd?))
+(define add-cherry (c_cons 'cherry))
+```
+
+Finally, the `uncurry2` function takes a 2-argument *curried* function as input
+and returns a non-curried version of it:
+
+```lisp
+;; converts a 2-argument curried function to a non-curried
+;; function
+(define (uncurry2 f)
+  (lambda (x y)
+    ((f x) y)))
+```
+
+Since functions are non-curried by default, uncurrying isn't common in Tiny Lisp.
+
+## Combinators
+
+Lets take a look at some simple higher-order functions called **combinators**.
+They are **pure functions**, i.e. functions that don't have any side-effects
+(such as changing global values, printing to the screen, opening a file, etc.),
+and whose result is always the same for the same input. They can be combined to
+build many other functions, and are of interest in theoretical computer science.
+
+### The I Combinator
+
+`(I x)` is the **identity function**, and it returns whatever you pass it:
+
+```lisp
+(define (I x) x)
+
+> (I 4)
+4
+
+> (I '(a b c))
+'(a b c)
+
+> (I I)
+#<procedure:I>
+```
+
+### The M Combinator
+
+The function `(M x)` takes a function `x` as input, and calls `x` on itself:
+
+```lisp
+(define (M x) (x x))
+
+> (M list)       ;;  (list list)
+'(#<procedure:list>)
+
+> (M symbol?)    ;;  (symbol? symbol?)
+#f
+
+> (M I)          ;;  (I I)
+#<procedure:I>
+
+> (M 4)          ;;  (4 4)
+. . application: not a procedure;
+ expected a procedure that can be applied to arguments
+  given: 4
+  arguments...:
+```
+
+The expression `(M M)` is interesting: it is an *infinite loop* that never
+returns a value. When you call `(M M)`, the argument `M` replaces `x` in the
+body of function `M`, i.e. `(x x)` becomes `(M M)`. This evaluates to `(M M)`,
+and the same thing happens again and again forever:
+
+We could write `M` as a lambda function:
+
+```lisp
+(lambda (x) (x x))
+```
+
+Then the call `(M M)` is the same as:
+
+```lisp
+((lambda (x) (x x)) (lambda (x) (x x)))
+```
+
+Just like `(M M)`, this expression never returns a value and loops forever.
+There's no explicit loop or recursion here. It shows the non-obvious fact that
+you can create an infinite loop just from calling lambda functions.
+
+### The K Combinator
+
+The function `(K x)` returns a function that takes a single input `y`, and for
+any value of `y` returns `x`. In other words, it returns a *constant* function
+that always returns `x`:
+
+```lisp
+(define (K x) (lambda (y) x))
+
+> ((K 'pizza) 'ignored)
+'pizza
+
+> (map (K 5) '(a b c d))
+'(5 5 5 5)
+```
+
+### The S Combinator
+
+Function `S3` takes 3 inputs:
+
+```lisp
+(define (S3 x y z)
+  ((x z) (y z)))
+```
+
+This is pretty weird! `x` and `y` are functions, and `z` is an argument to both.
+`x` must also return a function that can be applied to the output of `y`. Here
+is an example of calling it:
+
+```lisp
+;; helper functions
+(define (make-add a) (lambda (n) (+ n a)))
+(define (times2 n) (* 2 n))
+
+> (S3 make-add times2 3)
+9
+```
+
+The call to `S3` is evaluated like this:
+
+- `(S3 make-add times2 3)`
+- `((make-add 3) (times2 3))`
+- `((make-add 3) 6)`
+- `((lambda (n) (+ n 3)) 6)`
+- `(+ 6 3)`
+- `9`
+
+Intuitively, `S3` can be thought of as a generalization of function composition.
+`(S3 x y z)` composes `x` and `y` --- but first it calls `x` on `z` and `y` on
+`z` (and composes the results).
+
+`S` is a curried version of `S3`. You can pass 0, 1, 2, or 3 arguments to `S`
+(you must always pass exactly 3 arguments to `S3`):
+
+```lisp
+(define S (curry S3)) ;; curry is a built-in function
+```
+
+This lets us pass 0, 1, 2, or 3 arguments to `S`, which is useful for combining
+combinators.
+
+### I in Terms of S and K
+
+Interestingly, the identity function `I` can be defined in terms of `S` and `K`
+like this:
+
+```lisp
+(define (I a) ((S K K) a))
+
+> (I 4)
+4
+> (I '(a b c))
+'(a b c)
+> (I I)
+#<procedure:I>
+```
+
+To see why this is true, let's evaluate `((S K K) 'a)`.  Since `S` is curried,
+`(S K K)` evaluates to a function that takes one argument, which in this example
+is `'a`. Thus `((S K K) 'a)` evaluates to the same thing as `(S3 K K 'a)`.
+
+Following the definition of `S3`, `(S3 K K 'a)` evaluates to `((K 'a) (K 'a))`.
+`(K 'a)` returns a function that always returns `'a` so `((K 'a) (K 'a))`
+evaluates to `'a`. And so `((S K K) 'a)` evaluates to `'a`, which means `(S K
+K)` is the identity function.
+
+### Completeness of S and K
+
+Why bother with little functions like `S` and `K`? They don't seem very useful.
+
+Surprisingly, functions `S` and `K` can be combined to define *any* other pure
+function. You could think of `S` and `K`  like a low-level assembly language for
+pure functions, or as the atoms of computation. 
+
+We won't cover the proof here, but check out [the Wikipedia page on
+combinatory
+logic](https://en.wikipedia.org/wiki/Combinatory_logic#Completeness_of_the_S-K_basis)
+if you're curious.
+
+## Case Study: Symbolic Programming
+
+One of the original uses of Lisp was **symbolic programming**, e.g. doing
+algebra using variables instead of numbers. Even today, is can still be a useful
+tool for such problems.
+
+### Propositional Logic
+
+Lets write some functions that process a language of **literal boolean
+propositional expressions** like `(t and (not f))` and `((f or f) and ((not t)
+and f))`. 
+
+The symbols `t` and `f` stand for *true* and *false*. Importantly, they are
+*not*  the built-in [Racket] boolean values (`#t` and `#f`) since this is our
+own little language different from [Racket].
+
+### Checking Valid Expressions
+
+The first thing we will write is a function that checks if an expression is
+valid propositional logic for our expression. We consider the following to be
+valid expressions:
+
+- `t`
+- `f`
+- `(not e)` where `e` is a valid expression
+- `(e1 and e2)` where `e1` and `e2` are valid expressions
+- `(e1 or e2)` where `e1` and `e2` are valid expressions
+- `(e1 implies e2)` where `e1` and `e2` are valid expressions
+- `(e1 iff e2)` where `e1` and `e2` are valid expressions
+
+We will write two different solutions: one using many small helper functions,
+and the second way using `match`.
+
+### Recognizing Propositional Expressions
+
+The first thing we will do is implement **recognizer functions** that check if
+an expression is a valid propositional logic expression:
+
+```lisp
+;;
+;; recognizing literals t and f
+;;
+(define (is-true? e) (equal? e 't))
+(define (is-false? e) (equal? e 'f))
+
+(define (is-literal? e)
+  (or (is-false? e)
+      (is-true? e)))
+
+;;
+;; general helper functions
+;;
+(define (length lst)
+  (cond [(empty? lst) 0]
+        [else (+ 1 (length (rest lst)))]))
+
+(define (second lst)
+  (first (rest lst)))
+
+;; returns true iff lst is a list of length n
+(define (nlist? n lst)
+  (and (list? lst) 
+       (= n (length lst))))
+
+;;
+;; recognizing a not expression
+;;
+
+;; (not expr)
+(define (is-not? e)
+  (and (nlist? 2 e)
+       (equal? 'not (first e))))
+
+;;
+;; recognizing binary expressions of the form (p op q)
+;;
+
+;; (p op q)
+(define (is-bin-op? e op)
+  (and (nlist? 3 e)
+       (equal? op (second e))))
+
+(define (is-and? e) (is-bin-op? e 'and))        ;; (p and q)
+(define (is-or? e) (is-bin-op? e 'or))          ;; (p or q)
+(define (is-nand? e) (is-bin-op? e 'nand))      ;; (p nand q)
+(define (is-implies e) (is-bin-op? e 'implies)) ;; (p implies q)
+(define (is-iff? e) (is-bin-op? e 'iff))        ;; (p iff q)
+```
+
+Notice that none of the above recognizers are recursive. They only check the top-level form of an expression.
+
+Now we can write a recursive function that tests for valid propositional logic
+expressions:
+
+```lisp
+(define (is-expr? e)
+  (cond
+    [(is-literal? e) 
+     #t]
+    [(is-not? e) 
+     (is-expr? (second e))]
+    [(or (is-and? e)
+         (is-or? e)
+         (is-nand? e)
+         (is-implies? e)
+         (is-iff? e))
+     (and (is-expr? (first e))
+          (is-expr? (third e)))]
+    [else
+     #f]))
+
+> (is-expr? '(t and (not f)))
+#t
+
+> (is-expr? '((f or f) and ((not t) and f)))
+#t
+
+> (is-expr? '((f or a) and t))
+#f
+```
+
+### Evaluating Propositional Expressions
+
+Every literal propositional evaluates to either `t` or `f`. We can evaluate them
+like this:
+
+```lisp
+(define (eval-prop-bool e)
+  (cond
+    [(is-false? e) #f]
+    [(is-true? e) #t]
+    [(is-not? e)
+     (not (eval-prop-bool (second e)))]
+    [(is-and? e)
+     (and (eval-prop-bool (first e)) 
+          (eval-prop-bool (third e)))]
+    [(is-or? e)
+     (or (eval-prop-bool (first e)) 
+         (eval-prop-bool (third e)))]
+    [(is-nand? e)
+     (not (and (eval-prop-bool (first e))
+               (eval-prop-bool (third e))))]
+    [(is-implies? e)
+     (or (not (eval-prop-bool (first e)))
+         (eval-prop-bool (third e)))]
+    [(is-iff? e)
+     (equal? (eval-prop-bool (first e))
+             (eval-prop-bool (third e)))]
+    [else 
+     #f]))
+
+(define (eval-prop e)
+  (cond [(eval-prop-bool e) 't]
+        [else 'f]))
+
+> (eval-prop '((not t) and (t or (not f))))
+f
+```
+
+`eval-prop-bool` returns [Racket] boolean values, i.e. `#t` and `#f`. We do this
+for convenience so that we can use the built-in [Racket] forms `and`, `or`, and
+`not`. If instead we returned `'t` and `'f`, we'd have to write special-purpose
+versions of `and`, `or`, and `not` that work with `'t` and `'f`.
+
+### Rewriting an Expression Using Just nand
+
+An interesting fact about propositional logic is that *any* expression can be
+re-written as a logically equivalent one using only the `nand` operator.
+
+We need some rules to convert a propositional logic expression into an
+equivalent `nand`-only expression:
+
+- `(not p)` is logically equivalent to `(p nand p)`
+
+- `(p and q)` is logically equivalent to `((p nand q) nand (p nand q))`
+
+- `(p or q)` is logically equivalent to `((p nand p) nand (q nand q))`
+
+`(p implies q)` and `(p iff q)` are intentionally left out for now and left as
+an exercise for the reader. Note that `(p implies q)` is logically equivalent to
+`((not p) or q)`, and `(p iff q)` is logically equivalent to `(p and q) or ((not
+p) and (not q))`.
+
+In addition to literals `'t` and `'f'`, our `to-nand` function will handle other
+variables, like `p` or `q`. So, for example, `(p and q)` will be rewritten as
+`((p nand q) nand (p nand q))`.
+
+```lisp
+;;
+;; Converts propositional logic expression e to a nand-only expression.
+;; Assumes e is a valid propositional logic expression, and does not
+;; contain implies or iff operators. Variable names can be any symbol.
+;;
+(define (to-nand e)
+  (cond [(symbol? e) e] ;; return symbols unchanged
+        [(is-not? e) ;; (not p) = (p nand p)
+         (let ([second-nand (to-nand (second e))])
+           (make-nand second-nand
+                      second-nand))]
+        [(is-and? e) ;; (p and q) = ((p nand q) nand (p nand q))
+         (let ([p (to-nand (first e))]
+               (q (to-nand (third e))))
+           (make-nand (make-nand p q)
+                      (make-nand p q)))]
+        [(is-or? e)  ;; (p or q) = ((p nand p) nand (q nand q))
+         (let ([p (to-nand (first e))]
+               (q (to-nand (third e))))
+           (make-nand (make-nand p p)
+                      (make-nand q q)))]
+        [else (error "to-nand: unknown expression")]))
+
+> (to-nand '(p and q))
+'((p nand q) nand (p nand q))
+
+> (to-nand '((p and q) or ((not p) or q)))
+'((((p nand q) nand (p nand q)) nand ((p nand q) nand (p nand q)))
+  nand
+  ((((p nand p) nand (p nand p)) nand (q nand q)) nand (((p nand p) nand (p nand p)) nand (q nand q))))
+```
+
+We say that `to-nand` **compiles** an expression into a `nand`-only expression,
+and so `to-nand` is an example of a compiler.
+
+### Removing Double Negations
+
+Sometimes we can rewrite a propositional expression as a shorter but logically
+equivalent expression. For example, the **double negation elimination rule**
+says that any expression of the form `(not (not p))` is logically equivalent to
+`p`.
+
+Lets write a function that removes double negations:
+
+```lisp
+;; double negation elimination
+;; (not (not expr)) <==> expr
+(define (simplify e)
+  (cond [(symbol? e)
+         e]
+        [(and (is-not? e) ;; e = (not (not p))
+              (is-not? (second e)))
+         (simplify (second (second e)))]
+        [(is-not? e) ;; e = (not p)
+         (list 'not (simplify (second e)))]
+        [(is-and? e) ;; e = (p and q)
+         (list (simplify (first e))
+               'and
+               (simplify (third e)))]
+        [(is-or? e) ;; e = (p or q)
+         (list (simplify (first e))
+               'or
+               (simplify (third e)))]
         [else
-         (cons (first L)
-               (insert-sorted x (rest L)))]))
+         (error "simplify: unknown expression")]))
+
+> (simplify '((not (not t)) and (not (not t))))
+(t and t)
+
+> (simplify '(t or ((not (not f)) and t)))
+'(t or (f and t))
 ```
 
-### quicksort with filter
-
-**Quicksort** is another fundamental sorting algorithm that works by selecting a
-*pivot* element, partitioning the list into two sublists around that pivot,
-recursively sorting the two sublists, and then combining the results into a
-single sorted list.
-
-Here is an implementation of quicksort that chooses the first element of the
-list as the pivot:
-
-```lisp
-(define (quicksort L)
-  (cond [(<= (length L) 1)
-         L]
-        [else
-         (let* [(pivot (first L))
-                (smalls (filter (lambda (n) (< n pivot))
-                                (rest L)))
-                (bigs (filter (lambda (n) (>= n pivot))
-                              (rest L)))
-                ]
-           (concat (list (quicksort smalls)
-                         (list pivot)
-                         (quicksort bigs))))]))
-
-> (quicksort '(9 3 2 0 8 7 3))
-'(0 2 3 3 7 8 9)
-```
-
-Recall that `concat` appends a list of lists into a single list, e.g.
-`(concat '((1 2 5) (7) (8 10)))` evaluates to `'(1 2 5 7 8 10)`.
+There are many other simplifications we can apply, e.g. `(f and e)` is logically
+equivalent to `e`.

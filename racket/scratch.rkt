@@ -72,126 +72,115 @@
 ;; > (range 5)
 ;; '(0 1 2 3 4)
 
-#;(define (map fn L)
-    (cond [(empty? L)
-           '()]
-          [else
-           (cons (fn (first L))
-                 (map fn (rest L)))]))
 
-#;(define (filter pred? L)
-    (cond [(empty? L)
-           '()]
-          [(pred? (first L))
-           (cons (first L)
-                 (filter pred? (rest L)))]
-          [else
-           (filter pred? (rest L))]))
-
-#;(define (all pred? L)
-    (cond [(empty? L)
-           #t]
-          [else
-           (and (pred? (first L))
-                (all pred? (rest L)))]))
-
-(define (all pred? L)
-  (empty? (filter (lambda (x) (not (pred? x))) 
-                  L)))
-
-(define (foldr op init L)
-  (cond [(empty? L)
-         init]
-        [else
-         (op (first L)
-             (foldr op init (rest L)))]))
-
-(define (length L)
-  (foldr (lambda (x acc) (+ acc 1)) 
-         0 
-         L))
+;;
+;; (member? x L)
+;; returns #t if x is equal to an element on L (top-level),
+;; and #f otherwise
+;;
+;; > (member? 5 '(4 1 cat 5 7))
+;; #t
+;;
+;; > (member? 'bird '(a (bird nest) in the tree))
+;; #f
+;;
 
 (define (member? x L)
-  (foldr (lambda (next acc)
-           (or (equal? next x) acc))
-         #f
-         L))
+  (cond [(empty? L)  ;; rule 1: empty is false
+         #f]
+        [(equal? x (first L))
+         #t]
+        [else
+         (member? x (rest L))]))
+        
+#;(define (member? x L)
+    (and (not (empty? L))
+         (or (equal? x (first L))
+             (member? x (rest L)))))
+
+;;
+;; (last L)
+;; returns the final (top-level) element of L
+;; causes an error if L is the empty list
+;;
+;; > (last '(the big red dog))
+;; 'dog
+;;
+;; > (last '(once upon (a time)))
+;; '(a time)
+;;
+;; > (last '())
+;; .. error
+;;
+
+(define (last L)
+  (cond [(empty? L)
+         (error "last: empty list")]
+        [(empty? (rest L))
+         (first L)]
+        [else
+         (last (rest L))]
+        ))
+
+
+
+;;
+;; (remove-all x L)
+;; returns a new list that is the same as L but all
+;; top-level occurrences of x have been removed
+;;
+;; > (remove-all 'cat '())
+;; '()
+;;
+;; > (remove-all 'cat '(cat))
+;; '()
+;;
+;; > (remove-all 'dust '(dirt dust dust dirt (dirt dust)))
+;; '(dirt dirt (dirt dust))
+;;
+(define (remove-all x L)
+  (cond [(empty? L)
+         '()]
+        [(equal? x (first L))
+         (remove-all x (rest L))]
+        [else ;; non-empty, first element not x
+         (cons (first L)
+               (remove-all x (rest L)))]))
+
+;;
+;; (append A B)
+;; returns a new list consisting of all the elements of A
+;; followed by all the elements of B
+;;
+;; > (append '(once up) '(a time))
+;; '(once up a time)
+;;
+;; > (append '(+ 2 3) '(w x y z))
+;; '(+ 2 3 w x y z)
+;;
+
 
 (define (append A B)
-  (foldr cons B A))
-
-(define (map f L)
-  (foldr (lambda (next acc) (cons (f next) acc))
-         '()
-         L))
-
-(define (filter pred? L)
-  (foldr (lambda (next acc)
-           (cond [(pred? next)
-                  (cons next acc)]
-                 [else
-                  acc]))
-         '()
-         L))
-
-#;(define (flatten L)
-    (cond [(empty? L)
-           '()]
-          [(list? (first L))
-           (append (flatten (first L))
-                   (flatten (rest L)))]
-          [else
-           (cons (first L)
-                 (flatten (rest L)))]))
-
-#;(define (flatten L)
-    (cond [(empty? L)
-           '()]
-          [else
-           (let* [(head (first L))
-                  (tail (rest L))
-                  (flat-tail (flatten tail))]
-             (cond [(list? head)
-                    (append (flatten head)
-                            flat-tail)]
-                   [else
-                    (cons head flat-tail)]))]))
-
-
-(define (flatten L)
-  (foldr (lambda (next acc)
-           (cond [(list? next)
-                  (append (flatten next) acc)]
-                 [else
-                  (cons next acc)]))
-         '()
-         L))
-
-
-(define (deep-sum L)
-  (foldr + 0 (flatten L)))
-
-(define (deep-map f L)
-  (foldr (lambda (x acc)
-           (cons (cond [(list? x)
-                        (deep-map f x)]
-                       [else
-                        (f x)])
-                 acc))
-         '()
-         L))
-
-(define (insert-sorted x L)
-  (cond [(empty? L)
-         (list x)]
-        [(<= x (first L))
-         (cons x L)]
+  (cond [(empty? A)
+         B]
         [else
-         (cons (first L)
-               (insert-sorted x (rest L)))]))
+         (cons (first A)
+               (append (rest A)
+                       B))]
+        ))
 
-(define (insertion-sort L)
-  (foldr insert-sorted '() L))
+
+;;
+;; (concat list-of-lists)
+;; returns a new list that consist of all the elements of the
+;; lists on list-of-lists
+;;
+;; > (concat '((1 2) (three four five) (six) (7 8)))
+;; '(1 2 three four five six 7 8)
+;;
+;; > (concat (list '(a b c) '() '(d e (f) g)))
+;; '(a b c d e (f) g)
+;;
 
 (define (concat list-of-lists)
   (cond [(empty? list-of-lists)
@@ -201,17 +190,19 @@
                  (concat (rest list-of-lists)))]
         ))
 
-(define (quicksort L)
-  (cond [(<= (length L) 1)
-         L]
-        [else
-         (let* [(pivot (first L))
-                (smalls (filter (lambda (n) (< n pivot))
-                                (rest L)))
-                (bigs (filter (lambda (n) (>= n pivot))
-                              (rest L)))
-                ]
-           (concat (list (quicksort smalls)
-                         (list pivot)
-                         (quicksort bigs))))]))
-
+;;
+;; (reverse L)
+;; returns a new list with the elements of L in reverse order
+;;
+;; > (reverse '())
+;; '()
+;;
+;; > (reverse '(a b c))
+;; '(c b a)
+;;
+;; > (reverse '(1 2 3 4 5))
+;; '(5 4 3 2 1)
+;;
+;; > (reverse '(this (is a) (big test)))
+;; '((big test) (is a) this)
+;;
