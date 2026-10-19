@@ -950,7 +950,7 @@ quadratic.
 
 ### reverse a list with an accumulator
 
-`(reverse-acc L)` returns a new list that is the reverse of the list `L`. It
+`(reverse-acc L acc)` returns a new list that is the reverse of the list `L`. It
 does it using an accumulator, which lets it run in linear time. The idea of an
 accumulator is to keep track of the result as we go so that we don't have to
 call `append` repeatedly.
@@ -1418,10 +1418,10 @@ the calls to `op` are evaluated in the usual way:
 
 ### member has a right fold
 
-The `(member x L)` function can be written like this:
+The `(member? x L)` function can be written like this:
 
 ```lisp
-(define (member x L)
+(define (member? x L)
   (foldr (lambda (next acc) (or (eq? next x) acc))
          #f
          L))
@@ -1500,7 +1500,7 @@ accumulated values as is.
 
 ### flattening a list
 
-`(flatten L)`returns a new list with all internal sub-lists removed, but the
+`(flatten L)` returns a new list with all internal sub-lists removed, but the
 non-list elements kept as they are in the order they appear in the original
 list.
 
@@ -1905,8 +1905,8 @@ write the composition of all three as $h \circ g \circ f$, which is the same as
 $h \circ (g \circ f)$. This has the structure of a right fold. 
 
 Recall that right fold is `(foldr op init lst)`. What would be `init` for
-composition? In others, what should `init` be in `(comp f (comp g (comp h
-init)))?
+composition? In others, what should `init` be in 
+`(comp f (comp g (comp h init)))`?
 
 The answer is the **identity function**, i.e. the function that returns whatever
 you pass it. We could write it as $I(x) = x$, and so for example, $f \circ I =
@@ -1938,7 +1938,7 @@ This shows that the functions are applied in *reverse* order, which most humans
 find counter-intuitive. So lets write a variation of `compose-all` that applies
 the functions in the order they are given:
 
-``lisp
+```lisp
 (define (pipeline fns)
   (compose-all (reverse fns)))
 ```
