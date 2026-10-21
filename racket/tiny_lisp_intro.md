@@ -950,7 +950,7 @@ quadratic.
 
 ### reverse a list with an accumulator
 
-`(reverse-acc L)` returns a new list that is the reverse of the list `L`. It
+`(reverse-acc L acc)` returns a new list that is the reverse of the list `L`. It
 does it using an accumulator, which lets it run in linear time. The idea of an
 accumulator is to keep track of the result as we go so that we don't have to
 call `append` repeatedly.
@@ -1418,10 +1418,10 @@ the calls to `op` are evaluated in the usual way:
 
 ### member has a right fold
 
-The `(member x L)` function can be written like this:
+The `(member? x L)` function can be written like this:
 
 ```lisp
-(define (member x L)
+(define (member? x L)
   (foldr (lambda (next acc) (or (eq? next x) acc))
          #f
          L))
@@ -1434,29 +1434,6 @@ For example, `(member? 3 '(1 2 3 4))` evaluates to:
     (or (equal? 2 3)
         (or (equal? 3 3)  ;; a match!
             (or (equal? 4 3) #f))))
-```
-
-### append as a right fold
-
-The `(append A B)` function can be written as this simple right fold:
-
-```lisp
-(define (append A B)
-  (foldr cons B A))
-
-> (append '(1 2 3) '(a b))
-'(1 2 3 a b)
-```
-
-Tracing this:
-
-```
-(append '(1 2 3) '(a b))
-= (foldr cons '(a b) '(1 2 3))
-= (cons 1 (cons 2 (cons 3 '(a b))))
-= (cons 1 (cons 2 '(3 a b)))
-= (const 1 '(2 3 a b))
-= '(1 2 3 a b)
 ```
 
 ## map and filter as a right folds
@@ -1498,9 +1475,32 @@ The folding function for `filter` is a little more complex. It checks if the
 accumulated values. If it does not, it skips the element and keeps the
 accumulated values as is.
 
+### append as a right fold
+
+The `(append A B)` function can be written as this simple right fold:
+
+```lisp
+(define (append A B)
+  (foldr cons B A))
+
+> (append '(1 2 3) '(a b))
+'(1 2 3 a b)
+```
+
+Tracing this:
+
+```
+(append '(1 2 3) '(a b))
+= (foldr cons '(a b) '(1 2 3))
+= (cons 1 (cons 2 (cons 3 '(a b))))
+= (cons 1 (cons 2 '(3 a b)))
+= (const 1 '(2 3 a b))
+= '(1 2 3 a b)
+```
+
 ### flattening a list
 
-`(flatten L)`returns a new list with all internal sub-lists removed, but the
+`(flatten L)` returns a new list with all internal sub-lists removed, but the
 non-list elements kept as they are in the order they appear in the original
 list.
 
@@ -1905,8 +1905,8 @@ write the composition of all three as $h \circ g \circ f$, which is the same as
 $h \circ (g \circ f)$. This has the structure of a right fold. 
 
 Recall that right fold is `(foldr op init lst)`. What would be `init` for
-composition? In others, what should `init` be in `(comp f (comp g (comp h
-init)))?
+composition? In others, what should `init` be in 
+`(comp f (comp g (comp h init)))`?
 
 The answer is the **identity function**, i.e. the function that returns whatever
 you pass it. We could write it as $I(x) = x$, and so for example, $f \circ I =
@@ -1938,7 +1938,7 @@ This shows that the functions are applied in *reverse* order, which most humans
 find counter-intuitive. So lets write a variation of `compose-all` that applies
 the functions in the order they are given:
 
-``lisp
+```lisp
 (define (pipeline fns)
   (compose-all (reverse fns)))
 ```
