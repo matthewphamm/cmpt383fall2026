@@ -1641,7 +1641,7 @@ Now `(foldr insert-sorted '() L))` returns a copy of `L` in sorted order.
 
 ## quicksort with filter
 
-**Quicksort** is another` sorting algorithm that works by selecting a *pivot*
+**Quicksort** is another sorting algorithm that works by selecting a *pivot*
 element, partitioning the list into two sub-lists around that pivot, and
 recursively sorting the two sub-lists.
 
