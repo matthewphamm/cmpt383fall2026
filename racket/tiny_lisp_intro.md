@@ -1416,7 +1416,7 @@ the calls to `op` are evaluated in the usual way:
 = 3
 ```
 
-### member has a right fold
+### member? as a right fold
 
 The `(member? x L)` function can be written like this:
 
@@ -1430,10 +1430,15 @@ The `(member? x L)` function can be written like this:
 For example, `(member? 3 '(1 2 3 4))` evaluates to:
 
 ```lisp
-(or (equal? 1 3)
-    (or (equal? 2 3)
-        (or (equal? 3 3)  ;; a match!
-            (or (equal? 4 3) #f))))
+(member? 3 '(1 2 3 4))
+= (foldr op  ;; op is (lambda (next acc) (or (equal? next x) acc))
+         #f
+         '(1 2 3 4))
+= (op 1 (op 2 (op 3 (op 4 #f))))
+= (op 1 (op 2 (op 3 #f)))
+= (op 1 (op 2 #t))
+= (op 1 #t)
+= #t
 ```
 
 ## map and filter as a right folds

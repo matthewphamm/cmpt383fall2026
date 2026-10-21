@@ -384,8 +384,20 @@
 ;;
 ;; Implement (append A B) using foldr.
 ;;
+#;(define (append A B)
+    (cond [(empty? A)
+           B]
+          [else
+           (cons (first A)
+                 (append (rest A)
+                         B))]
+          ))
 
-
-
-
-
+;;
+;; (foldr op init '(a b c d)) evaluates to
+;; (op a (op b (op c (op d init))))
+;;
+#;(define (append A B)
+    (foldr op
+           init
+           L))
