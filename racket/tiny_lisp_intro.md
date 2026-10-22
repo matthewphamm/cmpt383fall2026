@@ -1416,7 +1416,7 @@ the calls to `op` are evaluated in the usual way:
 = 3
 ```
 
-### member has a right fold
+### member? as a right fold
 
 The `(member? x L)` function can be written like this:
 
@@ -1430,33 +1430,15 @@ The `(member? x L)` function can be written like this:
 For example, `(member? 3 '(1 2 3 4))` evaluates to:
 
 ```lisp
-(or (equal? 1 3)
-    (or (equal? 2 3)
-        (or (equal? 3 3)  ;; a match!
-            (or (equal? 4 3) #f))))
-```
-
-### append as a right fold
-
-The `(append A B)` function can be written as this simple right fold:
-
-```lisp
-(define (append A B)
-  (foldr cons B A))
-
-> (append '(1 2 3) '(a b))
-'(1 2 3 a b)
-```
-
-Tracing this:
-
-```
-(append '(1 2 3) '(a b))
-= (foldr cons '(a b) '(1 2 3))
-= (cons 1 (cons 2 (cons 3 '(a b))))
-= (cons 1 (cons 2 '(3 a b)))
-= (const 1 '(2 3 a b))
-= '(1 2 3 a b)
+(member? 3 '(1 2 3 4))
+= (foldr op  ;; op is (lambda (next acc) (or (equal? next x) acc))
+         #f
+         '(1 2 3 4))
+= (op 1 (op 2 (op 3 (op 4 #f))))
+= (op 1 (op 2 (op 3 #f)))
+= (op 1 (op 2 #t))
+= (op 1 #t)
+= #t
 ```
 
 ## map and filter as a right folds
@@ -1497,6 +1479,29 @@ The folding function for `filter` is a little more complex. It checks if the
 `next` element satisfies `pred?`. If it does, it pushes it onto the front of the
 accumulated values. If it does not, it skips the element and keeps the
 accumulated values as is.
+
+### append as a right fold
+
+The `(append A B)` function can be written as this simple right fold:
+
+```lisp
+(define (append A B)
+  (foldr cons B A))
+
+> (append '(1 2 3) '(a b))
+'(1 2 3 a b)
+```
+
+Tracing this:
+
+```
+(append '(1 2 3) '(a b))
+= (foldr cons '(a b) '(1 2 3))
+= (cons 1 (cons 2 (cons 3 '(a b))))
+= (cons 1 (cons 2 '(3 a b)))
+= (const 1 '(2 3 a b))
+= '(1 2 3 a b)
+```
 
 ### flattening a list
 
@@ -1641,7 +1646,7 @@ Now `(foldr insert-sorted '() L))` returns a copy of `L` in sorted order.
 
 ## quicksort with filter
 
-**Quicksort** is another` sorting algorithm that works by selecting a *pivot*
+**Quicksort** is another sorting algorithm that works by selecting a *pivot*
 element, partitioning the list into two sub-lists around that pivot, and
 recursively sorting the two sub-lists.
 
