@@ -1766,14 +1766,15 @@ Now consider this one:
 variable `n` is *free*. But, in `g`, `n` is bound to the value 1. The function
 plus this binding of `n` is a closure.
 
-Conceptually, you can think of a closure as being a **let over lambda**:
+There's a nice way to think of closures in Racket: conceptually,  a closure is a
+**let over lambda**:
 
 ```lisp
 (define g1
-    (let ([n 1])
-        (lambda (x)
-            (+ n x))
-    )
+    (let ([n 1])      ;; let over lambda
+        (lambda (x)   ;;
+            (+ n x))  ;;
+    )                 ;;
 )
 
 > (g1 5)
@@ -1787,13 +1788,11 @@ it can use.
 in the function. For example, `n` is free in `(lambda (x) (+ n x))`. Any
 programming language that lets you define functions inside functions must decide
 how to handle free variables. Closures are a common solution to this problem.
-Another is to simply disallow returning functions with free variables, but this
-reduces the flexibility of returning functions.
+Another way is to simply disallow returning functions with free variables, but this greatly reduces the flexibility of returning functions.
 
 ## Composing Functions
 
-Recall how **function composition** works in mathematics. Suppose you have these
-two functions:
+Recall  **function composition** from math. Given the two functions:
 
 $$
 \begin{align*}
@@ -1802,7 +1801,7 @@ g(x) &= 2x + 1
 \end{align*}
 $$
 
-The composition of $f$ and $g$ is:
+Their **composition** is:
 
 $$
 \begin{align*}
@@ -1812,7 +1811,7 @@ f(g(x)) &= g(x)^2 \\
 \end{align*}
 $$
 
-$\circ$ is the function composition operator:
+$\circ$ is the **function composition operator**:
 
 $$
 \begin{align*}
@@ -1840,18 +1839,17 @@ In code, we can compose functions directly by calling them:
 25
 ```
 
-We can also compose functions *without* without an explicit variable. The `comp`
-function takes two single-input functions as input and returns their a function
-that is their composition:
+We can also write a function that returns the composition of two given
+functions. The `comp` function takes two single-input functions as input and
+returns their a function that is their composition:
 
 ```lisp
 (define (comp f g)
     (lambda (x) (f (g x))))
 ```
 
-The idea is that `(comp f g)` returns a function that first applies `g` to its
-input, and then applies `f` to the result of that, i.e. it does `g` and then
-`f`.
+`(comp f g)` returns a function that first applies `g` to its input, and then
+applies `f` to the result of that, i.e. it does `g` and then `f`.
 
 This lets us define `h` from above without explicitly using `x`:
 
@@ -1862,17 +1860,17 @@ This lets us define `h` from above without explicitly using `x`:
 25
 ```
 
-Here's a function that returns the second element of a list:
+For example, here's a function that returns the second element of a list:
 
 ```lisp
-(define my-second (comp first rest))
+(define second (comp first rest))
 
-> (my-second '(big red apple))
+> (second '(big red apple))
 'red
 ```
 
-We call `(my-second lst)`, but the `lst` parameter does *not* appear in the
-definition of `my-second`: it is *implicit*.
+We call `(second lst)`, but the `lst` parameter does *not* appear in the
+definition of `second`: it is *implicit*.
 
 The `twice` function takes a function, `f`, as input and returns `f` composed
 with itself, i.e. $f \circ f$:
@@ -1899,7 +1897,7 @@ it is not part of Tiny Lisp. So lets implement our own version called
 `(compose-all f1 f2 ... fn)` that returns the composition of `f1` to `fn`, i.e.
 `(f1 (f2 ... (fn x)))`.
 
-To write this function, suppose we have three functions `h`, `g`, and `f`, each
+Lets start with a concrete example with three functions: `h`, `g`, and `f`, each
 of which takes 1 input and returns 1 output. Using the $\circ$ operator, we can
 write the composition of all three as $h \circ g \circ f$, which is the same as
 $h \circ (g \circ f)$. This has the structure of a right fold. 
@@ -1987,8 +1985,8 @@ get a useful function:
 (define add5 (add_b 5))
 ```
 
-In Tiny Lisp, most functions are *not* written in a curried style. We can write
-a function that converts a non-curried function into a curried one:
+In Tiny Lisp, most functions are *not* written in a curried style. Here's a
+function that converts a non-curried function into a curried one:
 
 ```lisp
 ;; assumes f is a 2-parameter uncurried function;
@@ -2093,6 +2091,10 @@ build many other functions, and are of interest in theoretical computer science.
 #<procedure:I>
 ```
 
+While `I` doesn't do useful computation, as we saw above for `compose-all`, it
+acts like the identity element for function composition, i.e. `f \circ I = f`
+and `I \circ f = f`.
+
 ### The M Combinator
 
 The function `(M x)` takes a function `x` as input, and calls `x` on itself:
@@ -2192,11 +2194,15 @@ Intuitively, `S3` can be thought of as a generalization of function composition.
 (you must always pass exactly 3 arguments to `S3`):
 
 ```lisp
-(define S (curry S3)) ;; curry is a built-in function
+(define S       ;; curried version of S3
+  (lambda (x)   ;; can be passed 0, 1, 2, or 3 arguments
+    (lambda (y)
+      (lambda (z)
+        ((x z) (y z))))))
 ```
 
-This lets us pass 0, 1, 2, or 3 arguments to `S`, which is useful for combining
-combinators.
+This lets us pass 0, 1, 2, or 3 arguments to `S`, which is useful when working
+with combinators.
 
 ### I in Terms of S and K
 
@@ -2229,7 +2235,7 @@ Why bother with little functions like `S` and `K`? They don't seem very useful.
 
 Surprisingly, functions `S` and `K` can be combined to define *any* other pure
 function. You could think of `S` and `K`  like a low-level assembly language for
-pure functions, or as the atoms of computation. 
+pure functions: the atoms of computation. 
 
 We won't cover the proof here, but check out [the Wikipedia page on
 combinatory
@@ -2239,24 +2245,25 @@ if you're curious.
 ## Case Study: Symbolic Programming
 
 One of the original uses of Lisp was **symbolic programming**, e.g. doing
-algebra using variables instead of numbers. Even today, is can still be a useful
-tool for such problems.
+algebra with variables instead of numbers. Even today, Lisp can still be a
+useful tool for such problems.
 
-### Propositional Logic
+### Symbolic Propositional Logic
 
 Lets write some functions that process a language of **literal boolean
 propositional expressions** like `(t and (not f))` and `((f or f) and ((not t)
 and f))`. 
 
 The symbols `t` and `f` stand for *true* and *false*. Importantly, they are
-*not*  the built-in [Racket] boolean values (`#t` and `#f`) since this is our
-own little language different from [Racket].
+*not*  the built-in Tiny Lisp boolean values (`#t` and `#f`) since this is our
+own little language different from Tiny Lisp.
 
 ### Checking Valid Expressions
 
-The first thing we will write is a function that checks if an expression is
-valid propositional logic for our expression. We consider the following to be
-valid expressions:
+The first thing we will write is a function that checks if an expression is a
+valid propositional logic for our expression. We'll call this a **recognizer function**, since it recognizes valid expressions.
+
+We consider the following to be valid expressions:
 
 - `t`
 - `f`
@@ -2266,13 +2273,9 @@ valid expressions:
 - `(e1 implies e2)` where `e1` and `e2` are valid expressions
 - `(e1 iff e2)` where `e1` and `e2` are valid expressions
 
-We will write two different solutions: one using many small helper functions,
-and the second way using `match`.
-
 ### Recognizing Propositional Expressions
 
-The first thing we will do is implement **recognizer functions** that check if
-an expression is a valid propositional logic expression:
+To write the recognizer function, we first write a few helper functions:
 
 ```lisp
 ;;
@@ -2325,7 +2328,8 @@ an expression is a valid propositional logic expression:
 (define (is-iff? e) (is-bin-op? e 'iff))        ;; (p iff q)
 ```
 
-Notice that none of the above recognizers are recursive. They only check the top-level form of an expression.
+Notice that none of the above recognizers are recursive. They only check the
+top-level form of an expression.
 
 Now we can write a recursive function that tests for valid propositional logic
 expressions:
@@ -2365,8 +2369,10 @@ like this:
 ```lisp
 (define (eval-prop-bool e)
   (cond
-    [(is-false? e) #f]
-    [(is-true? e) #t]
+    [(is-false? e) 
+     #f]
+    [(is-true? e) 
+     #t]
     [(is-not? e)
      (not (eval-prop-bool (second e)))]
     [(is-and? e)
@@ -2397,13 +2403,15 @@ f
 
 `eval-prop-bool` returns [Racket] boolean values, i.e. `#t` and `#f`. We do this
 for convenience so that we can use the built-in [Racket] forms `and`, `or`, and
-`not`. If instead we returned `'t` and `'f`, we'd have to write special-purpose
-versions of `and`, `or`, and `not` that work with `'t` and `'f`.
+`not`. Otherwise, we'd have to write special-purpose versions of `and`, `or`,
+and `not` that work with `'t` and `'f`.
 
 ### Rewriting an Expression Using Just nand
 
 An interesting fact about propositional logic is that *any* expression can be
-re-written as a logically equivalent one using only the `nand` operator.
+re-written as a logically equivalent one using only the `nand` operator. This
+can be useful in electronic circuit design, where `nand` gates are the basic
+building blocks.
 
 We need some rules to convert a propositional logic expression into an
 equivalent `nand`-only expression:
@@ -2430,7 +2438,8 @@ variables, like `p` or `q`. So, for example, `(p and q)` will be rewritten as
 ;; contain implies or iff operators. Variable names can be any symbol.
 ;;
 (define (to-nand e)
-  (cond [(symbol? e) e] ;; return symbols unchanged
+  (cond [(symbol? e)
+          e]         ;; return symbols unchanged
         [(is-not? e) ;; (not p) = (p nand p)
          (let ([second-nand (to-nand (second e))])
            (make-nand second-nand
@@ -2445,7 +2454,8 @@ variables, like `p` or `q`. So, for example, `(p and q)` will be rewritten as
                (q (to-nand (third e))))
            (make-nand (make-nand p p)
                       (make-nand q q)))]
-        [else (error "to-nand: unknown expression")]))
+        [else
+         (error "to-nand: unknown expression")]))
 
 > (to-nand '(p and q))
 '((p nand q) nand (p nand q))
