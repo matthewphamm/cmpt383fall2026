@@ -2476,16 +2476,15 @@ and so `to-nand` is an example of a compiler.
 
 ### Removing Double Negations
 
-Sometimes we can rewrite a propositional expression as a shorter but logically
-equivalent expression. For example, the **double negation elimination rule**
-says that any expression of the form `(not (not p))` is logically equivalent to
-`p`.
+Another interesting application is to simplify an expression. For example, the
+**double negation elimination rule** says that any expression of the form `(not
+(not p))` is logically equivalent to `p`.
 
 Lets write a function that removes double negations:
 
 ```lisp
 ;; double negation elimination
-;; (not (not expr)) <==> expr
+;; (not (not expr)) ==> expr
 (define (simplify e)
   (cond [(symbol? e)
          e]
