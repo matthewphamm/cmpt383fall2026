@@ -1799,15 +1799,18 @@ Another way is to simply disallow returning functions with free variables, but t
 
 Recall  **function composition** from math. Given the two functions:
 
+```math
 $$
 \begin{align*}
 f(x) &= x^2 \\
 g(x) &= 2x + 1
 \end{align*}
 $$
+```
 
 Their **composition** is:
 
+```math
 $$
 \begin{align*}
 f(g(x)) &= g(x)^2 \\
@@ -1815,15 +1818,18 @@ f(g(x)) &= g(x)^2 \\
         &= 4x^2 + 4x + 1
 \end{align*}
 $$
+```
 
 $\circ$ is the **function composition operator**:
 
+```math
 $$
 \begin{align*}
 (f \circ g)(x) &= (2x + 1)^2 \\
                &= 4x^2 + 4x +1
 \end{align*}
 $$
+```
 
 In code, we can compose functions directly by calling them:
 
@@ -1845,21 +1851,21 @@ In code, we can compose functions directly by calling them:
 ```
 
 We can also write a function that returns the composition of two given
-functions. The `comp` function takes two single-input functions as input and
+functions. The `compose` function takes two single-input functions as input and
 returns their a function that is their composition:
 
 ```lisp
-(define (comp f g)
+(define (compose f g)
     (lambda (x) (f (g x))))
 ```
 
-`(comp f g)` returns a function that first applies `g` to its input, and then
+`(compose f g)` returns a function that first applies `g` to its input, and then
 applies `f` to the result of that, i.e. it does `g` and then `f`.
 
 This lets us define `h` from above without explicitly using `x`:
 
 ```lisp
-(define h (comp f g))
+(define h (compose f g))
 
 > (h 2)
 25
@@ -1868,7 +1874,7 @@ This lets us define `h` from above without explicitly using `x`:
 For example, here's a function that returns the second element of a list:
 
 ```lisp
-(define second (comp first rest))
+(define second (compose first rest))
 
 > (second '(big red apple))
 'red
@@ -1881,7 +1887,7 @@ The `twice` function takes a function, `f`, as input and returns `f` composed
 with itself, i.e. $f \circ f$:
 
 ```lisp
-(define (twice f) (comp f f))
+(define (twice f) (compose f f))
 ```
 
 For instance:
@@ -1897,8 +1903,8 @@ For instance:
 
 ## Composing Multiple Functions
 
-[Racket]'s built-in `compose` function lets you compose 2 or more functions, but
-it is not part of Tiny Lisp. So lets implement our own version called
+The built-in [Racket] `compose` function lets you compose 2 or more functions,
+but it is not part of Tiny Lisp. So lets implement our own version called
 `(compose-all f1 f2 ... fn)` that returns the composition of `f1` to `fn`, i.e.
 `(f1 (f2 ... (fn x)))`.
 
@@ -1909,7 +1915,7 @@ $h \circ (g \circ f)$. This has the structure of a right fold.
 
 Recall that right fold is `(foldr op init lst)`. What would be `init` for
 composition? In others, what should `init` be in 
-`(comp f (comp g (comp h init)))`?
+`(compose f (compose g (compose h init)))`?
 
 The answer is the **identity function**, i.e. the function that returns whatever
 you pass it. We could write it as $I(x) = x$, and so for example, $f \circ I =
@@ -1919,7 +1925,7 @@ Now we can write `compose-all` as a right fold:
 
 ```lisp
 (define (compose-all fns)
-  (foldr comp
+  (foldr compose
          (lambda (x) x)   ;; identity function
          fns))
 ```
@@ -1963,14 +1969,14 @@ a series of functions that take 1 input each.
 Here are two different ways to write the addition function:
 
 ```lisp
-(define add_a          ;; uncurried
+(define add_a     ;; uncurried
     (lambda (x y)
         (+ x y)))
 
 > (add_a 3 4)
 7
 
-(define add_b          ;; curried
+(define add_b     ;; curried
     (lambda (x)
         (lambda (y)
             (+ x y))))
