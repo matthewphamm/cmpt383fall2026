@@ -1800,11 +1800,18 @@ Another way is to simply disallow returning functions with free variables, but t
 Recall  **function composition** from math. Given the two functions:
 
 ```math
+\begin{array}{rcl}
+f(g(x)) & = & g(x)^2 \\
+        & = & (2x + 1)^2 \\
+        & = & 4x^2 + 4x + 1
+\end{array}
+```
+
+```math
 \begin{aligned}
 f(x) &= x^2 \\
 g(x) &= 2x + 1
 \end{aligned}
-
 ```
 
 Their **composition** is:
