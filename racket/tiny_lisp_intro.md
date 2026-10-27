@@ -1800,12 +1800,11 @@ Another way is to simply disallow returning functions with free variables, but t
 Recall  **function composition** from math. Given the two functions:
 
 ```math
-$$
-\begin{align*}
-f(x) &{}={} x^2 \\
-g(x) &{}={} 2x + 1
-\end{align*}
-$$
+\begin{aligned}
+f(x) &= x^2 \\
+g(x) &= 2x + 1
+\end{aligned}
+
 ```
 
 Their **composition** is:
