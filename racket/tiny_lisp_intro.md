@@ -1802,8 +1802,8 @@ Recall  **function composition** from math. Given the two functions:
 ```math
 $$
 \begin{align*}
-f(x)&= x^2 \\
-g(x)&= 2x + 1
+f(x) &{}={} x^2 \\
+g(x) &{}={} 2x + 1
 \end{align*}
 $$
 ```
