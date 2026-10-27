@@ -1801,40 +1801,28 @@ Recall  **function composition** from math. Given the two functions:
 
 ```math
 \begin{array}{rcl}
+f(x) & = & x^2 \\
+g(x) & = & 2x + 1
+\end{array}
+```
+
+Their **composition** is:
+
+```math
+\begin{array}{rcl}
 f(g(x)) & = & g(x)^2 \\
         & = & (2x + 1)^2 \\
         & = & 4x^2 + 4x + 1
 \end{array}
 ```
 
-```math
-\begin{aligned}
-f(x) &= x^2 \\
-g(x) &= 2x + 1
-\end{aligned}
-```
-
-Their **composition** is:
-
-```math
-$$
-\begin{align*}
-f(g(x)) &= g(x)^2 \\
-        &= (2x + 1)^2 \\
-        &= 4x^2 + 4x + 1
-\end{align*}
-$$
-```
-
 $\circ$ is the **function composition operator**:
 
 ```math
-$$
-\begin{align*}
-(f \circ g)(x) &= (2x + 1)^2 \\
-               &= 4x^2 + 4x +1
-\end{align*}
-$$
+\begin{array}{rcl}
+(f \circ g)(x) & = & (2x + 1)^2 \\
+               & = & 4x^2 + 4x +1
+\end{array}
 ```
 
 In code, we can compose functions directly by calling them:
