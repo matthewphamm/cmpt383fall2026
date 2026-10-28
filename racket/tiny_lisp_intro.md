@@ -1503,7 +1503,88 @@ Tracing this:
 = '(1 2 3 a b)
 ```
 
-### flattening a list
+## insertion sort
+
+Recall that **insertion sort** is a sorting algorithm that builds a sorted list
+of numbers by taking numbers from the input list and inserting them in the
+correct sorted position in a new list. 
+
+Insertion sort can be implemented using a right fold. Each new number in the
+list is inserted into the correction position of the accumulated list (which is
+in sorted order) using a helper function `insert-sorted`:
+
+```lisp
+(define (insertion-sort L)
+  (foldr insert-sorted '() L))
+
+> (insertion-sort '(3 1 4 2 5))
+'(1 2 3 4 5)
+```
+
+For this to work we need to write `(insert-sorted x L)`, where `L` is in sorted
+order. It returns a new list with `x` inserted into the correct position in `L`,
+e.g.:
+
+```
+> (insert-sorted 3 '(1 2 4 5))
+'(1 2 3 4 5)
+```
+
+A recursive idea for implementing `insert-sorted` is:
+
+- if `L` is empty, return a list with just `x` in it
+- if `x` is less than or equal to the first element of `L`, insert `x` at the
+  front of `L` using `cons`
+- otherwise, insert `x` at the front of the rest of `L` and `cons` the first
+  element of `L` back onto the front of the result
+
+Here is an implementation of `insert-sorted`:
+
+```lisp
+(define (insert-sorted x L)
+  (cond [(empty? L)
+         (list x)]
+        [(<= x (first L))
+         (cons x L)]
+        [else
+         (cons (first L)
+               (insert-sorted x (rest L)))]))
+```
+
+Now `(foldr insert-sorted '() L))` returns a copy of `L` in sorted order.
+
+## quicksort with filter
+
+**Quicksort** is another sorting algorithm that works by selecting a *pivot*
+element, partitioning the list into two sub-lists around that pivot, and
+recursively sorting the two sub-lists.
+
+Here is an implementation of quicksort that chooses the first element of the
+list as the pivot:
+
+```lisp
+(define (quicksort L)
+  (cond [(<= (length L) 1)
+         L]
+        [else
+         (let* [(pivot (first L))
+                (smalls (filter (lambda (n) (< n pivot))
+                                (rest L)))
+                (bigs (filter (lambda (n) (>= n pivot))
+                              (rest L)))
+                ]
+           (concat (list (quicksort smalls)
+                         (list pivot)
+                         (quicksort bigs))))]))
+
+> (quicksort '(9 3 2 0 8 7 3))
+'(0 2 3 3 7 8 9)
+```
+
+Recall that `concat` appends a list of lists into a single list, e.g.
+`(concat '((1 2 5) (7) (8 10)))` evaluates to `'(1 2 5 7 8 10)`.
+
+## flattening a list
 
 `(flatten L)` returns a new list with all internal sub-lists removed, but the
 non-list elements kept as they are in the order they appear in the original
@@ -1593,87 +1674,6 @@ accumulated value:
          '()
          L))
 ```
-
-## insertion sort
-
-Recall that **insertion sort** is a sorting algorithm that builds a sorted list
-of numbers by taking numbers from the input list and inserting them in the
-correct sorted position in a new list. 
-
-Insertion sort can be implemented using a right fold. Each new number in the
-list is inserted into the correction position of the accumulated list (which is
-in sorted order) using a helper function `insert-sorted`:
-
-```lisp
-(define (insertion-sort L)
-  (foldr insert-sorted '() L))
-
-> (insertion-sort '(3 1 4 2 5))
-'(1 2 3 4 5)
-```
-
-For this to work we need to write `(insert-sorted x L)`, where `L` is in sorted
-order. It returns a new list with `x` inserted into the correct position in `L`,
-e.g.:
-
-```
-> (insert-sorted 3 '(1 2 4 5))
-'(1 2 3 4 5)
-```
-
-A recursive idea for implementing `insert-sorted` is:
-
-- if `L` is empty, return a list with just `x` in it
-- if `x` is less than or equal to the first element of `L`, insert `x` at the
-  front of `L` using `cons`
-- otherwise, insert `x` at the front of the rest of `L` and `cons` the first
-  element of `L` back onto the front of the result
-
-Here is an implementation of `insert-sorted`:
-
-```lisp
-(define (insert-sorted x L)
-  (cond [(empty? L)
-         (list x)]
-        [(<= x (first L))
-         (cons x L)]
-        [else
-         (cons (first L)
-               (insert-sorted x (rest L)))]))
-```
-
-Now `(foldr insert-sorted '() L))` returns a copy of `L` in sorted order.
-
-## quicksort with filter
-
-**Quicksort** is another sorting algorithm that works by selecting a *pivot*
-element, partitioning the list into two sub-lists around that pivot, and
-recursively sorting the two sub-lists.
-
-Here is an implementation of quicksort that chooses the first element of the
-list as the pivot:
-
-```lisp
-(define (quicksort L)
-  (cond [(<= (length L) 1)
-         L]
-        [else
-         (let* [(pivot (first L))
-                (smalls (filter (lambda (n) (< n pivot))
-                                (rest L)))
-                (bigs (filter (lambda (n) (>= n pivot))
-                              (rest L)))
-                ]
-           (concat (list (quicksort smalls)
-                         (list pivot)
-                         (quicksort bigs))))]))
-
-> (quicksort '(9 3 2 0 8 7 3))
-'(0 2 3 3 7 8 9)
-```
-
-Recall that `concat` appends a list of lists into a single list, e.g.
-`(concat '((1 2 5) (7) (8 10)))` evaluates to `'(1 2 5 7 8 10)`.
 
 ## deep functions
 
@@ -1793,37 +1793,38 @@ it can use.
 in the function. For example, `n` is free in `(lambda (x) (+ n x))`. Any
 programming language that lets you define functions inside functions must decide
 how to handle free variables. Closures are a common solution to this problem.
-Another way is to simply disallow returning functions with free variables, but this greatly reduces the flexibility of returning functions.
+Another way is to simply disallow returning functions with free variables, but
+this greatly reduces the flexibility of returning functions.
 
 ## Composing Functions
 
 Recall  **function composition** from math. Given the two functions:
 
-$$
-\begin{align*}
-f(x) &= x^2 \\
-g(x) &= 2x + 1
-\end{align*}
-$$
+```math
+\begin{array}{rcl}
+f(x) & = & x^2 \\
+g(x) & = & 2x + 1
+\end{array}
+```
 
 Their **composition** is:
 
-$$
-\begin{align*}
-f(g(x)) &= g(x)^2 \\
-        &= (2x + 1)^2 \\
-        &= 4x^2 + 4x + 1
-\end{align*}
-$$
+```math
+\begin{array}{rcl}
+f(g(x)) & = & g(x)^2 \\
+        & = & (2x + 1)^2 \\
+        & = & 4x^2 + 4x + 1
+\end{array}
+```
 
 $\circ$ is the **function composition operator**:
 
-$$
-\begin{align*}
-(f \circ g)(x) &= (2x + 1)^2 \\
-               &= 4x^2 + 4x +1
-\end{align*}
-$$
+```math
+\begin{array}{rcl}
+(f \circ g)(x) & = & (2x + 1)^2 \\
+               & = & 4x^2 + 4x +1
+\end{array}
+```
 
 In code, we can compose functions directly by calling them:
 
@@ -1845,21 +1846,21 @@ In code, we can compose functions directly by calling them:
 ```
 
 We can also write a function that returns the composition of two given
-functions. The `comp` function takes two single-input functions as input and
+functions. The `compose` function takes two single-input functions as input and
 returns their a function that is their composition:
 
 ```lisp
-(define (comp f g)
+(define (compose f g)
     (lambda (x) (f (g x))))
 ```
 
-`(comp f g)` returns a function that first applies `g` to its input, and then
+`(compose f g)` returns a function that first applies `g` to its input, and then
 applies `f` to the result of that, i.e. it does `g` and then `f`.
 
 This lets us define `h` from above without explicitly using `x`:
 
 ```lisp
-(define h (comp f g))
+(define h (compose f g))
 
 > (h 2)
 25
@@ -1868,7 +1869,7 @@ This lets us define `h` from above without explicitly using `x`:
 For example, here's a function that returns the second element of a list:
 
 ```lisp
-(define second (comp first rest))
+(define second (compose first rest))
 
 > (second '(big red apple))
 'red
@@ -1881,7 +1882,7 @@ The `twice` function takes a function, `f`, as input and returns `f` composed
 with itself, i.e. $f \circ f$:
 
 ```lisp
-(define (twice f) (comp f f))
+(define (twice f) (compose f f))
 ```
 
 For instance:
@@ -1897,8 +1898,8 @@ For instance:
 
 ## Composing Multiple Functions
 
-[Racket]'s built-in `compose` function lets you compose 2 or more functions, but
-it is not part of Tiny Lisp. So lets implement our own version called
+The built-in [Racket] `compose` function lets you compose 2 or more functions,
+but it is not part of Tiny Lisp. So lets implement our own version called
 `(compose-all f1 f2 ... fn)` that returns the composition of `f1` to `fn`, i.e.
 `(f1 (f2 ... (fn x)))`.
 
@@ -1909,7 +1910,7 @@ $h \circ (g \circ f)$. This has the structure of a right fold.
 
 Recall that right fold is `(foldr op init lst)`. What would be `init` for
 composition? In others, what should `init` be in 
-`(comp f (comp g (comp h init)))`?
+`(compose f (compose g (compose h init)))`?
 
 The answer is the **identity function**, i.e. the function that returns whatever
 you pass it. We could write it as $I(x) = x$, and so for example, $f \circ I =
@@ -1919,7 +1920,7 @@ Now we can write `compose-all` as a right fold:
 
 ```lisp
 (define (compose-all fns)
-  (foldr comp
+  (foldr compose
          (lambda (x) x)   ;; identity function
          fns))
 ```
@@ -1963,14 +1964,14 @@ a series of functions that take 1 input each.
 Here are two different ways to write the addition function:
 
 ```lisp
-(define add_a          ;; uncurried
+(define add_a     ;; uncurried
     (lambda (x y)
         (+ x y)))
 
 > (add_a 3 4)
 7
 
-(define add_b          ;; curried
+(define add_b     ;; curried
     (lambda (x)
         (lambda (y)
             (+ x y))))

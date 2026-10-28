@@ -137,7 +137,46 @@ a) Define the `M`, `I`, `K`, and `S` combinators as Racket functions.
 
 b) Show how to defined `I` in terms of `S` and `K`.
 
+
 ## Question 9
+
+Write a function `(evaluate expr)` that evaluates simple arithmetic expressions.
+Arithmetic expression are defined as follows:
+
+- numbers are arithmetic expressions
+
+- `(x + y)` is an arithmetic expression that evaluates to the sum of `x` and
+  `y`, where `x` and `y` are arithmetic expressions 
+
+- `(x - y)` is an arithmetic expression that evaluates to the difference of `x`
+  and `y`, where `x` and `y` are arithmetic expressions
+
+- `(x * y)` is an arithmetic expression that evaluates to the product of `x` and
+  `y`, where `x` and `y` are arithmetic expressions
+
+- `(x / y)` is an arithmetic expression that evaluates to the quotient of `x`
+  and `y`, where `x` and `y` are arithmetic expressions; if `y` is 0, then the
+  expression evaluates to the symbol `'error`
+
+For example:
+
+```lisp
+> (evaluate '(1 + 2))
+3
+> (evaluate '((1 + 2) * 3))
+9
+> (evaluate '((1 + 2) * (3 - 4)))
+-3
+> (evaluate '((5 - 1) / 0))
+'error
+```
+
+
+-----
+Previous Questions that Won't be Covered on the Quiz
+-----
+
+## Question 9: Not Covered
 
 Write a function that converts a [Racket] `if` form into an equivalent `cond`
 form.
@@ -150,7 +189,7 @@ For example:
        (else (g x y)))
 ```
 
-## Question 10
+## Question 10: Not Covered
 
 a) In Racket, what is the essential difference between functions and macros?
 
