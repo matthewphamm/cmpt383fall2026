@@ -61,7 +61,7 @@
   (cond [(empty? L)
          (error "empty list")]
         [else
-         (max-of-helper (rest L) (first L))]
+         (max-of-helper L (first L))]
         ))
 
 ;;
@@ -84,7 +84,8 @@
   (cond [(or (empty? A) (empty? B))
          '()]
         [else
-         (cons (list (first A) (first B)) (zip (rest A) (rest B)))]
+         (cons (list (first A) (first B))
+               (zip (rest A) (rest B)))]
         ))
     
 
@@ -126,7 +127,7 @@
 (define (range-helper i n)
   (cond [(not (number? n))
          (error "Not an integer")]
-        [(>= i n)
+        [(= i n)
          '()]
         [else
          (cons i (range-helper (+ i 1) n))]
@@ -134,6 +135,15 @@
 
 (define (range n)
   (range-helper 0 n))
+
+(define (range-dec n)
+  (range-dec-acc n 0))
+
+(define (range-dec-acc n i)
+  (cond [(= n i)
+         '()]
+        [else
+         (cons n (range-dec-acc (- n 1) 0))]))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

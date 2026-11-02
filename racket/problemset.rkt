@@ -127,4 +127,69 @@
 
 ;; Quesiton 7
 
+;; currying is to treat a function thats takes 1 or more inputs as a series of functions that
+;; takes 1 input each
+
+(define (currying f)
+  (lambda (x)
+    (lambda (y)
+      (f x y))))
+
+(define add2 ((currying +) 2))
+
+;; Question 8
+
+;; a) (M x) is (x x), (I x) is x the identity function, (K x) is (lambda (y) x)
+;;    S or S3 takes 3 inputs x,y,z and is defined like this (S3 x y z) = ( (x z) (y z))
+;; b) To define I in terms of S3 and K is (S3 K K z) = ( (K z) (K z) ) = z = (I z)
+
+;; Question 9
+
+;; what if there are multiple expressions not just (x op y) not just two
+;; how about three or more?
+
+#;(define (evaluate expr)
+  (cond [(number? expr)
+         expr]
+        [else
+         (let* [(left (evaluate (first expr)))
+                (op   (first (rest expr)))
+                (right (evaluate (first (rest (rest expr)))))]
+           (cond [(equal? op '+)
+                  (+ left right)]
+                 [(equal? op '-)
+                  (- left right)]
+                 [(equal? op '*)
+                  (* left right)]
+                 [(and (equal? op '/)
+                       (not (equal? right '0)))
+                  (/ left right)]
+                 [else
+                  'error]))]))
+
+(define (evaluate expr)
+  (cond [(number? expr) expr]
+        [else
+         (let*  [(left  (evaluate (first expr)))
+                (op    (first (rest expr)))
+                (right (evaluate (first (rest (rest expr)))))]
+           (cond [(or (equal? left 'error) (equal? right 'error)) 'error] ; pass errors up
+                 [(equal? op '+) (+ left right)]
+                 [(equal? op '-) (- left right)]
+                 [(equal? op '*) (* left right)]
+                 [(and (equal? op '/) (= right 0)) 'error]
+                 [(equal? op '/) (/ left right)]
+                 [else (error "unknown operator:" op)]))]))
+
+(define (check expr actual expected)
+  (cond [(equal? actual expected) (list 'ok expr)]
+        [else (list 'FAIL expr 'got actual 'expected expected)]))
+
+(check '(evaluate '(1 + 2))  (evaluate '(1 + 2))  3)
+(check '(evaluate '((1 + 2) * 3))  (evaluate '((1 + 2) * 3))  9)
+(check '(evaluate '((1 + 2) * (3 - 4)))  (evaluate '((1 + 2) * (3 - 4)))  -3)
+(check '(evaluate '((5 - 1) / 0))  (evaluate '((5 - 1) / 0))  'error)
+(check '(evaluate '(((5 - 1) / 0) + 1))  (evaluate '(((5 - 1) / 0) + 1))  'error)
+(check '(evaluate '(8 / 2))  (evaluate '(8 / 2))  4)
+
 

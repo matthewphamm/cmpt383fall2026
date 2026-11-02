@@ -2,7 +2,7 @@
 
 ;; Problem 1: count-evens
 
-(define (count-evens L)
+#;(define (count-evens L)
   (cond [(empty? L) 0]
         [(even? (first L))
          (+ 1 (count-evens (rest L)))]
@@ -246,4 +246,49 @@
 ;; (define fcons (flip cons))
 ;; (fcons '(b c d) 'a)
 ;; > '(a b c d)
-                         
+
+
+;; ----------------------------------------
+;; racket quiz solution from github (good practice?)
+
+;; Question 1
+
+(define (almost-last lst)
+  (cond [(< (length3 lst) 2)
+         'none]
+        [(= (length3 lst) 2)
+         (first lst)]
+        [else
+         (almost-last (rest lst))]
+        ))
+
+;; Question 2
+
+;; (op a (op b (op c (op d init))))
+
+#; (define (foldr op init L)
+     (cond [(empty? L)
+            init]
+           [else
+            (op (first L)
+                (foldr op init (rest L)))]
+           ))
+
+(define (drop-if pred? lst)
+  (foldr (lambda (next acc)
+           (cond [(pred? next)
+                  acc]
+                 [else
+                  (cons next acc)]))
+         '()
+         lst))
+
+(define (count-evens L)
+  (foldr (lambda (next acc)
+           (cond [(even? next)
+                  (+ 1 acc)]
+                 [else
+                  acc]))
+         0
+         L))
+                 
