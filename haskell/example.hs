@@ -73,10 +73,26 @@ myinit (x:xs) = x : myinit xs
 -- empty list 
 -- e.g. middle [1,2,3,4,5] = [2,3,4]
 
--- returns the the string + "s"; if the string ends in "s", returned unchanged; the
+middle [] = []
+middle (_:xs) = myinit xs
+
+-- returns the string + "s"; if the string ends in "s", returned unchanged; the
 -- plural of the empty string is the empty string
 -- e.g. pluralize "cat" = "cats", pluralize "cats" = "cats"
+
+puralize "" = ""
+puralize s  = if mylast s == 's'
+              then s
+              else s ++ "s"
 
 -- returns the sign of a number: "zero", "positive", or "negative"  
 -- e.g. sign 0 = "zero", sign 1 = "positive", sign (-1) = "negative"
 
+{- sign 0 = "zero"
+sign x = if x < 0
+         then "negative"
+         else "positive" -}
+
+sign n | n == 0    = "zero"
+       | n > 0     = "positive"
+       | otherwise = "negative"
