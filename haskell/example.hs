@@ -20,7 +20,7 @@ mysum (n:ns) = n + (mysum ns)
 -- returns the average of a list
 -- e.g. average [1,2,3] = 2
 
--- average ns = mysum ns / length ns
+average ns = mysum ns / mylength ns
 
 -- returns the first element of a list
 -- e.g. myhead [1,2,3] = 1
@@ -58,8 +58,16 @@ mylength (x:xs) = 1 + mylength xs
 -- returns the reverse of a list
 -- e.g. myreverse [1,2,3] = [3,2,1]
 
--- returns the lst with the last element removed
+myreverse [] = []
+myreverse (x:xs) = myreverse xs ++ [x] 
+
+-- returns a list with the last element removed
 -- e.g. myinit [1,2,3] = [1,2]
+
+myinit []     = undefined
+-- myinit xs = reverse (mytail (reverse xs)) -- in terms of performance not good but understanding is great
+myinit [x]    = []                           -- in this case if its one element so the last element in the list just return the empty list
+myinit (x:xs) = x : myinit xs
 
 -- returns the middle elements of a list; the middle of the empty list is the
 -- empty list 
