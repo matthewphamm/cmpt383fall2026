@@ -37,11 +37,23 @@ mytail (_:xs) = xs
 -- returns the last element of a list
 -- e.g. mylast [1,2,3] = 3
 
+mylast []     = undefined
+mylast [x]    = x           -- this just means if there is one element in the list
+mylast (_:xs) = mylast xs
+
 -- returns the first and last element of a list
 -- e.g. ends [1,2,3] = [1,3]
 
+ends []  = undefined
+ends [x] = [x, x]
+ends xs  = [myhead xs, mylast xs]
+-- ends (first:rest) = [first, mylast rest]
+
 -- returns the length of a list
 -- e.g. mylength [1,2,3] = 3
+
+mylength []     = 0
+mylength (x:xs) = 1 + mylength xs
 
 -- returns the reverse of a list
 -- e.g. myreverse [1,2,3] = [3,2,1]
