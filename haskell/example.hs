@@ -20,11 +20,19 @@ mysum (n:ns) = n + (mysum ns)
 -- returns the average of a list
 -- e.g. average [1,2,3] = 2
 
+-- average ns = mysum ns / length ns
+
 -- returns the first element of a list
 -- e.g. myhead [1,2,3] = 1
 
+myhead []     = undefined -- this is very clear in readability
+myhead (x:_) = x         -- _ is an annonymous variable meaning we won't be using that variable, we don't care about it
+
 -- returns all but the first element of a list
 -- e.g. mytail [1,2,3] = [2,3]
+
+mytail []     = undefined
+mytail (_:xs) = xs
 
 -- returns the last element of a list
 -- e.g. mylast [1,2,3] = 3
