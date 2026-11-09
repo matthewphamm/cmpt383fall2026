@@ -3,11 +3,19 @@
 -- returns the product of a list
 -- e.g. myproduct [1,2,3] = 6
 
+myproduct []     = 1                  -- rule 1 (base case)
+myproduct (n:ns) = n * (myproduct ns) -- rule 2 (recursive case)
+
 -- returns n! = 1 * 2 * ... * n
 -- e.g. factorial 4 = 24
 
+factorial n = myproduct [1..n] -- factorial n -> n! = 1 * ... * n
+
 -- returns the sum of a list
 -- e.g. mysum [1,2,3] = 6
+
+mysum []     = 0
+mysum (n:ns) = n + (mysum ns)
 
 -- returns the average of a list
 -- e.g. average [1,2,3] = 2
