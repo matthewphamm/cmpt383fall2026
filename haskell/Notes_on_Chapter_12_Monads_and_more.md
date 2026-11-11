@@ -109,8 +109,7 @@ structures as **containers**.
 
 The standard `map` function applies a function to every element of a *list*. We
 could also apply a function to every element of some other kind of container.
-For each different container, we can define a map-like function that applies a
-function to every element it contains.
+For each different container, we can define a map-like function.
 
 To support the creation of such map-like functions, Haskell provides the
 `Functor` type class:
@@ -130,17 +129,21 @@ container.
 
 > **Aside** In addition to `fmap`, [Haskell]'s `Functor` type class also defines
 > the operator `<$`:
+>
 > ```haskell
 > (<$) :: a -> f b -> f a
 > (<$) = fmap . const
 > ```
+>
 > This replaces each element in a container with a constant value, e.g.:
+>
 > ```haskell
 > > 5 <$ [1,2,3]
 > [5,5,5]
 > > "cat" <$ [1,2,3]
 ["cat","cat","cat"]
 > ```
+>
 > We won't cover `(<$)` further in these notes.
 
 ### Examples of Functors
@@ -202,7 +205,7 @@ has a single value. Here is the standard `fmap` for `Maybe`:
 instance Functor Maybe where
 -- fmap :: (a -> b) -> Maybe a -> Maybe b
 fmap _ Nothing  = Nothing
-fmap f (Just x) = Just (f x)
+fmap f (Just x) = Just (f x)f
 
 > fmap (+1) (Just 2)
 Just 3
@@ -234,7 +237,7 @@ always the same as just calling `id`. For example, with regular list mapping:
 ```
 
 The second law says that `fmap` *distributes* over `(.)` (function composition).
-Here' an example with regular list mapping:
+Here's an example with regular list mapping:
 
 ```haskell
   fmap (g . h) [x, y, z]
@@ -262,11 +265,11 @@ Here is the `Applicative` type class:
 ```haskell
 class Functor f => Applicative f where
 	pure :: a -> f a
-	(<*>) :: f (a -> b) -> f a -> f b
+	(<*>) :: f (a -> b) -> f a -> f b   
 ```
 
-`class Functor f => Applicative` means that `Applicative` to implement
-`Applicative` you must also implement `fmap` from `Functor`.
+`class Functor f => Applicative` means that to implement `Applicative` you must
+also implement `fmap` from `Functor`.
 
 The `pure` function converts a value of type `a` into a value of type `f a`.
 
@@ -289,7 +292,7 @@ instance Applicative Maybe where
 
 The `pure` function takes any value and puts it in a `Just`.
 
-`(<*>)` has two rules. The first says if the `Maybe` that is might contain your
+`(<*>)` has two rules. The first says if the `Maybe` that might contain your
 function is `Nothing`, then there is no function to apply and so `Nothing` is
 returned. The second rule says if there is a function `f`, then apply `f` to the
 value inside `mx` using `fmap`. We are allowed to use `fmap` because the
@@ -327,7 +330,7 @@ sensibly. See chapter 12 of the textbook for more details.
 ## Monads
 
 **Monads** are a generalization of applicatives and functors that have special
-importance in Haskell : any type that implements a monad can be used with
+importance in Haskell: any type that implements a monad can be used with
 **do**-notation. The name *monad* comes from [category
 theory](https://en.wikipedia.org/wiki/Category_theory), the branch of
 mathematics that inspired this whole approach.
@@ -493,7 +496,7 @@ You can use `(>>=)` in prefix position by replacing `transform`:
 > (>>=) [1,2,3] (\n -> [n,n])
 [1,1,2,2,3,3]
 > (>>=) (Just 5) (\n -> Just (n+1))
-Just
+Just 6
 ```
 
 Or, more commonly, it is used as an infix operator:
@@ -502,7 +505,7 @@ Or, more commonly, it is used as an infix operator:
 > [1,2,3] >>= (\n -> [n,n])
 [1,1,2,2,3,3]
 > (Just 5) >>= (\n -> Just (n+1))
-Just
+Just 6
 ```
 
 An advantage of the infix version is that it makes combining multiple calls a

@@ -8,10 +8,6 @@ changes the value of a variable outside the function.
 Pure functions are often easier to reason about and test than impure functions,
 and so as a general rule you should prefer pure functions over impure functions.
 
-But sometimes you don't have a choice. For example, if you want to do things
-like read or wrote data, or generate random numbers, you need to use impure
-functions. For example:
-
 But in programming, many functions are useful for their side effects. For
 example:
 
@@ -35,9 +31,9 @@ Lets gain some intuition for how Haskell deals with impure functions. The text
 asks you to imagine an interactive Haskell function, e.g. a chatbot that the
 user interacts with through text. In Haskell, you *can't* implement an
 interesting chatbot with the signature `String -> String` because the function
-will be pure, meaning it will always return the same string for the same input.
+is pure, meaning it will always return the same string for the same input.
 
-Now imagine that the chatbot function has the type `World -> (String, World)`.
+Now imagine that the chatbot function type was this: `World -> (String, World)`.
 The `World` type is a made-up type (just for this example) that represents the
 everything the chatbot knows about, e.g. the current date/time, rules for
 answering questions, a list of all previous inputs to the chatbot, and so on. So
@@ -47,8 +43,8 @@ of the world after the chatbot has replied. Instead of *modifying* the world,
 the chatbot *makes a new copy* of the world that is changed according to the
 chatbot's reply.
 
-`World` is not a real type. Instead, as Haskell chatbot would use the type `IO
-String`, which you could intuitively imagine as being defined like this:
+`World` is not a real type. Instead, a Haskell chatbot would use the type `IO
+String`, which you could *intuitively* imagine as being defined like this:
 
 ```haskell
 type IO String = World -> (String, World)
@@ -58,10 +54,10 @@ type IO String = World -> (String, World)
 of type is input and output.
 
 A function of type `IO a` can be thought of as taking the relevant state of the
-world as input, and returning a value (of type `a`) plus an updated state of the
-world as output. Any side-effects of the function are recorded in this changed
-world. Intuitively, the function *doesn't change* the world, but instead returns
-a brand new modified copy of the world.
+world as input, and outputtinga value (of type `a`) plus an updated state of the
+world. Any side-effects of the function are recorded in this changed world.
+Intuitively, the function *doesn't change* the world, but instead returns a
+brand new modified copy of the world.
 
 Expressions of type `IO a` are called **actions**. For example, `IO String` is
 the type of an *action* that returns a `String`, and `IO Int` is the type of an
@@ -170,8 +166,8 @@ there's no way to access the value of `a` outside the do-notation.
 ## Derived primitives
 
 The expression `putChar '\n'` is used a couple of times in `test1`, so lets
-write a function that does the same thing. First, note that the type of `putChar
-'\n'` is `IO ()`, i.e. an action that doesn't return a value:
+write a function that performs it. First, note that the type of `putChar '\n'`
+is `IO ()`, i.e. an action that doesn't return a value:
 
 ```haskell
 > :t putChar '\n'
@@ -296,9 +292,7 @@ hello :: IO ()
 hello = do myPutStr "Hi! What's your name? "
            name <- myGetLine
            myPutStrLn ("Hello " ++ name ++ ", how are you?")
-```
 
-```haskell  
 > hello
 Hi! What's your name? Alonzo
 Hello Alonzo, how are you?
@@ -313,9 +307,7 @@ printBox s = do myPutStr bar
                 myPutStr bar
              where n   = length s
                    bar = "+" ++ (replicate (n+2) '-') ++ "+" ++ "\n"
-```
 
-```haskell
 > printBox "Watch this space!"
 +-------------------+
 | Watch this space! |

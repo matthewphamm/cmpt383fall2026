@@ -10,9 +10,7 @@ For instance, `twice` takes a function as input:
 ```haskell
 twice :: (a -> a) -> a -> a
 twice f x = f (f x)
-```
 
-```haskell
 > twice (+1) 5
 7
 > twice (*2) 5
@@ -102,13 +100,13 @@ parameters switched.
 
 ## Processing lists
 
-A number of standard prelude functions have nice recursive definitions, and it's
+A number of standard Haskell functions have nice recursive definitions, and it's
 instructive to create our own implementations.
 
 ### map
 
-The standard `map f lst` functions applies `f` to each element of `lst`. For
-example, `map f [a,b,c]` evaluates to the same thing as `[f a, f b, f c]`.
+`map f lst` applies `f` to each element of `lst`. For example, `map f [a,b,c]`
+evaluates to the same thing as `[f a, f b, f c]`.
 
 Her's a recursive implementation:
 
@@ -127,7 +125,7 @@ mymap f (x:xs) = f x : mymap f xs
 
 Implement a function called `doublemap f lst` that evaluates to a list that has
 `f` applied *twice* to every element of `lst`,e .g. `doublemap f [a,b,c]`
-evaluates to `[f f a, f f b, f f c]`. For example:
+evaluates to `[f (f a), f (f b), f (f c)]`. For example:
 
 ```haskell
 > doublemap (*2) [1,2,3,4]
@@ -140,8 +138,8 @@ Include the most general type signature for `doublemap`.
 
 ### filter
 
-The standard `filter pred lst` function returns a list containing all the
-elements of `lst` that satisfy the predicate `pred`:
+`filter pred lst` returns a list containing all the elements of `lst` that
+satisfy the predicate `pred`:
 
 ```haskell
 > filter (>2) [1,6,0,4,2]
@@ -193,8 +191,8 @@ general type signature for `removeIf`.
 
 ### all
 
-The standard function `all pred lst` returns `True` if the predicate `pred` is
-satisfied by *all* the elements on `lst`, and `False` otherwise.
+`all pred lst` returns `True` if the predicate `pred` is satisfied by *all* the
+elements on `lst`, and `False` otherwise:
 
 ```haskell
 myall :: (a -> Bool) -> [a] -> Bool
@@ -209,8 +207,8 @@ True
 
 ### any
 
-The standard function `any pred lst` returns `True` if one, or more, of the
-elements in `lst` satisfy the predicate `pred`, and `False` otherwise.
+`any pred lst` returns `True` if one, or more, of the elements in `lst` satisfy
+the predicate `pred`, and `False` otherwise.
 
 ```haskell
 myany :: (a -> Bool) -> [a] -> Bool
@@ -246,15 +244,15 @@ Include the most general type signature for the `none`.
 
 ### takeWhile
 
-`takeWhile pred lst` is a standard Haskell function that returns a list of all
-the elements at the *start* of `lst` that satisfy `pred`. For instance:
+`takeWhile pred lst` returns a list of all the elements at the *start* of `lst`
+that satisfy `pred`. For instance:
 
 ```haskell
 > takeWhile (\c -> c `elem` "aeiou") "eat well!"
 "ea"
 ```
 
-`\c -> c `elem` "aeiou"` is a lambda function  that takes a character as input
+`\c -> c `elem` "aeiou"` is a lambda function that takes a character as input
 and returns `True` just when it's a lowercase vowel.
 
 Here's a recursive implementation:
@@ -274,9 +272,8 @@ mytakeWhile p (x:xs) = if p x
 
 ### dropWhile
 
-`dropWhile pred lst` is a standard function that returns a list that is the same
-as `lst` except all elements at the *start* of `lst` that satisfy `pred` are
-removed.
+`dropWhile pred lst` returns a list that is the same as `lst` except all
+elements at the *start* of `lst` that satisfy `pred` are *removed*.
 
 For example:
 
@@ -404,9 +401,9 @@ myfoldr op emptyval (x:xs) = x `op` (myfoldr op emptyval xs)
 
 `myfoldr` is a *right* fold, which means it evaluates operators starting at the
 right. For example, to calculate the sum `1+2+3`, right fold calculates `(1 + (2
-+ (3 + 0)))`. The `(+)` operator happens to be **commutative**, meaning that it
-doesn't matter what order you do addition in, e.g.  `a + b == b + a` for all
-numbers `a` and `b`. So the exact order of additions *doesn't* matter for `(+)`.
++ (3 + 0)))`. `(+)` happens to be **commutative**, meaning that it doesn't
+matter what order you do addition in, e.g. `a + b == b + a` for all numbers `a`
+and `b`. So the exact order of additions *doesn't* matter for `(+)`.
 
 But order matters for non-commutative operators like `(-)`. For example, `(1 -
 (2 - (3 - 4)))` is -2, while `(((1 - 2) - 3) - 4)` is -8.
@@ -515,7 +512,7 @@ need this to evaluate to `[f 3]`. So we can define  `op` like this:
 op x lst = (f x) : lst
 ```
 
-Here's an implementation of `map` using foldr:
+Here's an implementation of `map` using `foldr`:
 
 ```haskell
 mymap2 :: (a -> b) -> [a] -> [b]

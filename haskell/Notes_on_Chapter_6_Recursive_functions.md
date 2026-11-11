@@ -7,25 +7,26 @@ Since Haskell has no loops, recursion is a fundamental implementation technique.
 A **recursive function** is a function that calls itself, either directly or
 indirectly.
 
-For example, the **factorial** of a non-negative integer $n$ is defined to be
-$n!=1\cdot 2 \cdot 3 \cdot \ldots \cdot n$, and $0!=1$.
+For example, the **factorial** of a non-negative integer $n$ is defined
+(non-recursively)to be $n!=1\cdot 2 \cdot 3 \cdot \ldots \cdot n$, and $0!=1$.
+It corresponds to this function:
 
-Here is a non-recursive function that calculates it:
-
-```cpp
+```haskell
 fact1 :: Integer -> Integer
 fact1 n = product [1..n]
 ```
 
-And here is a recursive function:
+`[1..n]` is Haskell shorthand for the list `[1,2,3,...,n]`.
 
-```cpp
+Here is a recursive function:
+
+```haskell
 fact2 :: Integer -> Integer
 fact2 0 = 1                -- base case
 fact2 n = n * fact2 (n-1)  -- recursive case
 ```
 
-Recursive functions are normally divided into **base case** and **recursive
+Recursive functions are typically divided into **base case** and **recursive
 case** rules. A base case contains no recursive call, while a recursive case has
 one or more recursive calls. 
 
@@ -182,7 +183,7 @@ Include the most general type signature for `count`.
 
 Here is a Haskell implementation of selection sort:
 
-```cpp
+```haskell
 ssort :: Ord a => [a] -> [a]
 ssort [] = []
 ssort xs = [m] ++ ssort (remove m xs)

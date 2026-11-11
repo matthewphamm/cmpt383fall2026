@@ -3,9 +3,12 @@
 **Equational reasoning** is familiar to anyone who has taken a high school
 algebra class. Equational reasoning in algebra assumes a few basics laws, such
 as:
+
 - **Commutivity of multiplication** For all numbers $x$ and $y$, $xy=yx$.
+
 - **Associativity of addition** For all numbers $x$, $y$, and $z$, $x + (y + z)
   = (x + y) + z$.
+
 - **Distributivity** For all numbers $x$, $y$, and $z$, $x(y+z)=xy+xz$, and
   $(x+y)z=xz+yz$.
 
@@ -31,6 +34,7 @@ one multiplication and two additions, and $x^2 + (a + b)x + ab$ has three
 additions and three multiplications.
 
 ## Reasoning about Haskell
+
 Haskell definitions can also be treated as rules. For example:
 
 ```haskell
@@ -78,6 +82,7 @@ When it doesn't matter what order the patterns of a function definition are
 evaluated, they are said to be **non-overlapping**.
 
 ### Example: reasoning with reverse
+
 Suppose the `reverse` function is defined like this:
 
 ```haskell
@@ -96,8 +101,8 @@ Using this definition we can prove that for any value `x`, `reverse [x]` =
 = [x]
 ```
 
-
 ## Induction on numbers
+
 The proof technique of **mathematical induction** can be used to prove various
 properties of functions.
 
@@ -145,16 +150,20 @@ but we can prove it by induction:
     The induction hypothesis lets is replace `add n Zero` with `n`.
 
 ## Induction on lists
+
 Just as we can do induction on the natural numbers, there is possible to do
 induction on lists. If $P$ is some property about lists, then we can prove that
 $P$ holds for all lists if:
 
 - **Base case** Prove that $P$ holds for the empty list `[]`.
+
 - **Inductive case** Prove that *if* $P$ holds for any list `xs`, then for all
   `x` $P$ holds for `x : xs`. Both `x` and `xs` are the appropriate types.
 
 ## Some proofs with `reverse`
+
 ### Distributivity of reverse
+
 For example, induction on lists can be used to prove a *distributivity* law that
 `reverse (xs ++ ys)` = `reverse ys ++ reverse xs` for any lists `xs` and `ys`.
 Here is the definition of `reverse`:
@@ -188,6 +197,7 @@ ys)` = `reverse ys ++ reverse (x:xs)` holds for all elements `x`:
 ```
 
 ### Reversing a List Twice
+
 Now lets prove that `reverse (reverse xs)` = `xs` for lists `xs`. 
 
 The first step is to show that the base case holds, i.e. that when `xs` is the
@@ -213,6 +223,7 @@ all non-empty lists `xs`, and show that for any element `x`, `reverse (reverse
 ```
 
 ### Proving the functor laws for lists
+
 Recall that `map f lst` applies function `f` to every element of `lst`. `fmap`
 is a generalization of `map` that works on any data type for which is defined.
 The standard version Haskell's `fmap` satisfy these two laws, which in
@@ -285,6 +296,7 @@ g (fmap h (x:xs))` for all elements `x`:
 ```
 
 ## Rest of the Chapter
+
 The rest of the chapter shows an example of how adding extra parameters to
 certain functions can make them run faster. The final section is about reasoning
 about the correctness of a compiler.
