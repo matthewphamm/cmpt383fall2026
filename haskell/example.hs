@@ -2,7 +2,7 @@
 
 -- returns the product of a list
 -- e.g. myproduct [1,2,3] = 6
-
+myproduct :: Num a => [a] -> a        -- type signature
 myproduct []     = 1                  -- rule 1 (base case)
 myproduct (n:ns) = n * (myproduct ns) -- rule 2 (recursive case)
 
@@ -96,3 +96,10 @@ sign x = if x < 0
 sign n | n == 0    = "zero"
        | n > 0     = "positive"
        | otherwise = "negative"
+
+-- returns the logical and of two booleans
+-- e.g. myand True False = False
+
+myand :: Bool -> Bool -> Bool
+myand True True = True
+myand _ _       = False
