@@ -33,18 +33,16 @@ Using `Predicate a` in a type signature can improve readability:
 ```haskell
 remove_if :: Predicate a -> [a] -> [a]
 remove_if p lst = filter (not . p) lst
-```
 
-```haskell
 > remove_if even [1..10]
 [1,3,5,7,9]
 ```
 
-Note the use of composition on the expression `not . p`. This is equivalent to
-the function application `not (p x)`, where `x` is any value of type `a`. Using
-the composition operator `.` lets us write it in the briefer form `not . p`,
-which can be read as "the negation of predicate `p`". Using composition in this
-way is a common pattern in Haskell.
+Note the use of composition for `not . p`. This is equivalent to the function
+application `not (p x)`, where `x` is any value of type `a`. Using the
+composition operator `.` lets us write it in the briefer form `not . p`, which
+can be read as "the negation of predicate `p`". Using composition in this way is
+a common pattern in Haskell.
 
 Finally, we note that type declarations using `type` *cannot* be *recursive*,
 the type being defined with `type` cannot refer to itself. For example, this
@@ -56,9 +54,9 @@ type Tree = (Int, [Tree]) -- Error! Recursion not allowed here
 
 ## Data declarations
 
-**Data declarations** create completely new types, as opposed to just synonyms
-for existing types. For example, the `Bool` type in the standard prelude is
-defined like this:
+**Data declarations** create completely new types, as opposed to just making a
+new name for an existing type. For example, the `Bool` type in the standard
+prelude is defined like this:
 
 ```haskell
 data Bool = True | False
@@ -71,7 +69,7 @@ This defines a new type named `Bool`, and says that it has exactly two values,
 > **Comparison** Data declarations in Haskell are similar to enumeration types
 > in languages like C++ or Java, but with stronger type guarantees.
 
-Here's a data declaration that might be useful for modeling a traffic light:
+Here's a data declaration that models a traffic light:
 
 ```haskell
 data Light = Red | Yellow | Green
@@ -90,10 +88,10 @@ The three values of `Light` are `Red`, `Yellow`, and `Green`. They are called
 Both the name of new data type and its constructors *must* start with capital
 letters.
 
-The line `deriving (Eq, Show)` tells Haskell to provide default `==`, `/=`, and
-`show` functions for `Light`. `==` and `/=` test if `Light` values are equal or
-not equal, and `show` converts `Light` values to strings, making them usable in
-the interpreter:
+The line `deriving (Eq, Show)` tells Haskell to provide default implementations
+of the `==`, `/=`, and `show` functions for `Light`. `==` and `/=` test if
+`Light` values are equal or not equal, and `show` converts `Light` values to
+strings, making them usable in the interpreter:
 
 ```haskell
 > Green
@@ -130,9 +128,7 @@ Constructors in a data declaration can also take inputs. For example:
 ```haskell
 data Shape = Circle Float | Rect Float Float
     deriving Show
-```
 
-```haskell
 > Circle 2.7
 Circle 2.7
 > Rect 8 2
@@ -201,9 +197,7 @@ error. For instance:
 safeHead :: [a] -> Maybe a
 safeHead []    = Nothing
 safeHead (x:_) = Just x
-```
 
-```haskell
 > safeHead "apple"
 Just 'a'
 > safeHead ""
@@ -416,7 +410,7 @@ one:
 
 ```haskell
 foldright :: (a -> b -> b) -> b -> (List a) -> b
-foldright _ init Nil          = init
+foldright _  init Nil         = init
 foldright op init (Cons x xs) = x `op` (foldright op init xs)
 ```
 

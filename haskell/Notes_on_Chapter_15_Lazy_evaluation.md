@@ -1,8 +1,11 @@
-An unusual feature of Haskell is how it evaluates expressions in a **lazy** way.
-Among other things, lazy evaluation is what lets Haskell work with infinite
+# Lazy Evaluation
+
+An unusual feature of Haskell is that it evaluates expressions in a **lazy**
+way. Among other things, lazy evaluation is what lets Haskell work with infinite
 lists.
 
 ## Introduction
+
 Here's an example that demonstrates the key idea of lazy evaluation:
 
 ```haskell
@@ -39,6 +42,7 @@ evaluation passes the arguments *unevaluated* to the function, only evaluating
 them if needed.
 
 ## Evaluation strategies
+
 A **reducible expression**, or **redex** for short, is an expression that has
 the form of a function applied to one or more arguments that can be "reduced" by
 performing the application.
@@ -91,6 +95,7 @@ using pass by value. Functions that require their arguments be passed by value
 are called **strict** functions.
 
 ###  Lambda Expressions
+
 Consider this curried version of `mult`:
 
 ```haskell
@@ -127,6 +132,7 @@ The "no reduction under lambdas" rule used with innermost reduction is called
 reduction is called **call-by-name**.
 
 ## Termination
+
 Some functions run forever when you evaluate them:
 
 ```haskell
@@ -177,6 +183,7 @@ reduction of an expression that terminates, then call-by-name will terminate for
 the expression and return the same final result. 
 
 ## Number of reductions
+
 Consider this function:
 
 ```haskell
@@ -213,7 +220,8 @@ re-evaluating them. The two `(1+2)` expressions share the same value.
 
 **Lazy evaluation** is call-by-name implemented using this sharing trick.
 
-##  Infinite structures
+## Infinite structures
+
 Lazy evaluation can be used with infinite structures. For example:
 
 ```haskell
@@ -251,6 +259,7 @@ It terminates and returns 1. Lazy evaluation doesn't evaluate any part of the
 list after the first element.
 
 ## Modular programming
+
 The function `take n lst` returns the first `n` elements of list `lst`. It can
 be used with infinite lists:
 
@@ -265,6 +274,7 @@ infinite lists can sometimes be simpler than ones that generate finite lists
 because the infinite lists don't need to handle the stopping condition.
 
 ### Generating primes
+
 Here's an elegant use of infinite lists to generate prime numbers:
 
 ```haskell
@@ -300,6 +310,7 @@ primes less than 100:
 ```
 
 ## Strict evaluation
+
 Haskell uses lazy evaluation by default, but it also provides a **strict
 application** operator, `($!)` for when you don't want lazy evaluation. The
 expression `f x` is lazy evaluation, and `f $! x` is strict evaluation.
