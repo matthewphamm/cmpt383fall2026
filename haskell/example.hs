@@ -136,3 +136,39 @@ mult a b c = a * b * c
 -- zip a b: combines two lists into a lst of tuples
 
 -- id x: identity function
+
+-- lambda function
+inc :: Int -> Int
+inc = \x -> x + 1
+
+plus :: Int -> Int -> Int
+plus = \x y -> x + y
+
+-- operator sections
+-- (*10) 9 gives 90
+
+-- twice function
+twice :: (a -> a) -> a -> a
+twice f x = f (f x)
+
+-- makeAdder function
+-- returns a function that adds n to its argument
+-- makeAdder :: Int -> (Int -> Int)
+makeAdder :: Int -> Int -> Int
+makeAdder n = (+ n)
+
+add4 = makeAdder 4
+
+-- flip function
+myFlip :: (a -> b -> c) -> b -> a -> c
+myFlip f x y = f y x
+
+-- map function
+myMap :: (a -> b) -> [a] -> [b]
+myMap _ [] = []
+myMap f (x:xs) = f x : myMap f xs -- ':' is the cons version of Haskell
+
+
+-- filter function
+
+-- foldr function
