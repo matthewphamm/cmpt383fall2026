@@ -112,6 +112,27 @@ sign n | n == 0    = "zero"
 -- returns the logical and of two booleans
 -- e.g. myand True False = False
 
+-- myand :: Bool -> (Bool -> Bool)
 myand :: Bool -> Bool -> Bool
 myand True True = True
 myand _ _       = False
+
+-- multiply 3 Ints
+mult :: Int -> Int -> Int -> Int
+mult a b c = a * b * c
+
+-- fst: first element of a tuple (x,y)
+-- snd: second element of a tuple (x,y)
+-- what are the types of fst and snd?
+-- fst :: (a,b) -> a
+-- snd :: (a,b) -> b
+
+-- take n lst
+-- returns the first n elements of list lst
+
+-- drop n lst
+-- returns a copy of lst without the first n elements
+
+-- zip a b: combines two lists into a lst of tuples
+
+-- id x: identity function
