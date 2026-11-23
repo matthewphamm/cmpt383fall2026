@@ -181,4 +181,108 @@ myMap f (x:xs) = f x : myMap f xs -- ':' is the cons version of Haskell
 -- What's the msot general type signature for a funciton that sorts a list of items?
 -- ans: sort :: Ord a => [a] -> [a]
 
--- Write a function
+-- Write a function insert x L that inserts x into the correct position in the
+-- sorted list L. Assume L is a sorted list, and x is the same type as items on
+-- L.
+
+insert :: Ord a => a -> [a] -> [a]
+insert x []     = [x]
+insert x (y:ys) | x < y     = x : y :ys
+                | otherwise = y : (insert x ys)
+
+-- Implement insertion_sort lst to that sorts lst using insertion sort (use the
+-- insert function to help). Use basic recursion and no higher-order functions.
+-- Also write the most general type signature.
+
+-- insertion sort
+insertion_sort :: Ord a => [a] -> [a]
+insertion_sort []     = []
+insertion_sort (x:xs) = insert x (insertion_sort xs)
+
+-- Implement insertion_sort' that implements insertion sort using foldr and the
+-- insert function from above.
+
+-- foldr op init lst
+insertion_sort' :: Ord a => [a] -> [a]
+insertion_sort' lst = foldr insert [] lst
+
+-- agree f g x is a helper function that checks if functions f and g returns the
+-- same value for x; in general, agree f g x returns f x == g x
+--
+-- For example, to check that f and g return the same value for the same inputs,
+-- we could write check = agree insertion_sort insertion_sort'. Then you can run
+-- test cases like this:
+--
+-- > check "pizza"
+-- True
+-- > check [7,4,2,9,3,5,2,2,1]
+-- True
+
+agree :: Eq b => (a -> b) -> (a -> b) -> a -> Bool 
+agree f g x = (f x) == (g x)
+
+--
+-- Implement quicksort
+--
+quicksort :: Ord a => [a] -> [a]
+quicksort []           = []
+quicksort (pivot:rest) = (quicksort smalls) ++ [pivot] ++ (quicksort bigs)
+                       where smalls = filter (<= pivot) rest
+                             bigs   = filter (> pivot) rest 
+
+--
+-- all bit strings of length n
+-- 
+-- bools n returns all bit strings of length n, e.g.
+--
+-- > bools 3
+-- ["000","001","010","011","100","101","110","111"]
+--
+-- > take 3 (bools 10)
+-- ["0000000000","0000000001","0000000010"]
+--
+
+-- ??
+
+
+--
+-- range function
+--
+-- range n returns the list of ints [0,1,...,n-1] (like Python's range
+-- function). Implement it in a way that takes advantage of Haskell's lazy
+-- evaluation.
+--
+
+-- ??
+
+
+--
+-- Prime numbers
+--
+
+--
+-- Write a function called isPrime :: Int -> Bool that such that isPrime n
+-- returns True if n is a prime, and False otherwise.
+--
+
+-- idea: if all the numbers from 2 up to and including the square root of n
+-- *don't* divide evenly into n, then n must be a prime
+
+-- ??
+
+-- Define primes to be infinite (!) list of all primes [2, 3, 5, 7, 11, ...]
+
+-- ??
+
+-- firstNprimes n returns a list of the first n prime numbers
+
+-- ??
+
+-- primessLessThan n returns a list of all primes less than n
+
+-- ??
+
+-- nthPrime n returns the nth prime, e.g. if n is 1 then 2 is returned; if n is
+-- 2 then 3 is returned, ...
+
+-- ??
