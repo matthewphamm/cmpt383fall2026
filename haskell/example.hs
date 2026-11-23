@@ -242,7 +242,8 @@ quicksort (pivot:rest) = (quicksort smalls) ++ [pivot] ++ (quicksort bigs)
 -- ["0000000000","0000000001","0000000010"]
 --
 
--- Understand how this works as it could be on the quiz
+-- Understand how this works as it could be on the quiz, if this
+-- was on the quiz it would be half or more than half of the quiz
 
 bits :: Int -> [String]
 bits 0 = [[]]
@@ -257,8 +258,8 @@ bits n = map ('0':) bs ++ map ('1':) bs
 -- evaluation.
 --
 
--- ??
-
+range :: Int -> [Int]
+range n = take n [0..]
 
 --
 -- Prime numbers
@@ -272,7 +273,11 @@ bits n = map ('0':) bs ++ map ('1':) bs
 -- idea: if all the numbers from 2 up to and including the square root of n
 -- *don't* divide evenly into n, then n must be a prime
 
--- ??
+isPrime :: Int -> Bool
+isPrime n = n > 1 && all nonDivisor candidates
+          where nonDivisor d = n `mod` d /= 0
+                leqSquare d = d * d <= n
+                candidates = takeWhile leqSquare [2..]
 
 -- Define primes to be infinite (!) list of all primes [2, 3, 5, 7, 11, ...]
 
