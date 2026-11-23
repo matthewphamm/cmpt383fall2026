@@ -281,17 +281,25 @@ isPrime n = n > 1 && all nonDivisor candidates
 
 -- Define primes to be infinite (!) list of all primes [2, 3, 5, 7, 11, ...]
 
--- ??
+primes :: [Int]
+primes = filter isPrime [2..]
 
 -- firstNprimes n returns a list of the first n prime numbers
 
--- ??
+firstNprimes :: Int -> [Int]
+firstNprimes n = take n primes
 
 -- primessLessThan n returns a list of all primes less than n
 
--- ??
+primesLessThan :: Int -> [Int]
+primesLessThan n = takeWhile (<n) primes
 
 -- nthPrime n returns the nth prime, e.g. if n is 1 then 2 is returned; if n is
 -- 2 then 3 is returned, ...
 
--- ??
+nthPrime n = primes !! n
+
+
+type Predicate a = a -> Bool
+remove_if :: Predicate a -> [a] -> [a]
+remove_if pred = filter (not . pred)
