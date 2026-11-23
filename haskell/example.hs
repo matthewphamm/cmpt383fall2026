@@ -303,3 +303,18 @@ nthPrime n = primes !! n
 type Predicate a = a -> Bool
 remove_if :: Predicate a -> [a] -> [a]
 remove_if pred = filter (not . pred)
+
+data Light = Red | Yellow | Green
+  deriving (Eq, Show)
+
+change :: Light -> Light
+change Red    = Green
+change Yellow = Red
+change Green  = Yellow
+
+data Shape = Circle Float | Rect Float Float
+  deriving Show
+
+area :: Shape -> Float
+area (Circle r) = pi * r ^ 2
+area (Rect w h) = w * h
