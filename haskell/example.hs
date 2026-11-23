@@ -233,17 +233,21 @@ quicksort (pivot:rest) = (quicksort smalls) ++ [pivot] ++ (quicksort bigs)
 --
 -- all bit strings of length n
 -- 
--- bools n returns all bit strings of length n, e.g.
+-- bits n returns all bit strings of length n, e.g.
 --
--- > bools 3
+-- > bits 3
 -- ["000","001","010","011","100","101","110","111"]
 --
 -- > take 3 (bools 10)
 -- ["0000000000","0000000001","0000000010"]
 --
 
--- ??
+-- Understand how this works as it could be on the quiz
 
+bits :: Int -> [String]
+bits 0 = [[]]
+bits n = map ('0':) bs ++ map ('1':) bs
+       where bs = bits (n - 1)
 
 --
 -- range function
