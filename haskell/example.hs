@@ -149,7 +149,10 @@ plus = \x y -> x + y
 
 -- twice function
 twice :: (a -> a) -> a -> a
-twice f x = f (f x)
+-- twice f x = f (f x)
+-- twice f = f . f
+twice f x = (f . f) x
+mytail2 = twice mytail
 
 -- makeAdder function
 -- returns a function that adds n to its argument
@@ -172,3 +175,10 @@ myMap f (x:xs) = f x : myMap f xs -- ':' is the cons version of Haskell
 -- filter function
 
 -- foldr function
+
+-- Sorting
+
+-- What's the msot general type signature for a funciton that sorts a list of items?
+-- ans: sort :: Ord a => [a] -> [a]
+
+-- Write a function
