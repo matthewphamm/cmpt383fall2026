@@ -154,13 +154,13 @@ twice :: (a -> a) -> a -> a
 twice f x = (f . f) x
 mytail2 = twice mytail
 
--- makeAdder function
--- returns a function that adds n to its argument
--- makeAdder :: Int -> (Int -> Int)
-makeAdder :: Int -> Int -> Int
-makeAdder n = (+ n)
+-- makeadd'er function
+-- returns a function that add's n to its argument
+-- makeadd'er :: Int -> (Int -> Int)
+makeadd'er :: Int -> Int -> Int
+makeadd'er n = (+ n)
 
-add4 = makeAdder 4
+add'4 = makeadd'er 4
 
 -- flip function
 myFlip :: (a -> b -> c) -> b -> a -> c
@@ -318,3 +318,29 @@ data Shape = Circle Float | Rect Float Float
 area :: Shape -> Float
 area (Circle r) = pi * r ^ 2
 area (Rect w h) = w * h
+
+-- first :: [a] -> a
+-- first = head
+-- This is not safe as when you input an empty list it will crash
+
+safeFirst :: [a] -> Maybe a
+safeFirst []   = Nothing
+safeFirst(x:_) = Just x
+
+-- call to safeFirst "cat" returns Just 'c' or call to safeFirst [] returns Nothing
+
+safeMinimum :: Ord a => [a] -> Maybe a
+safeMinimum [] = Nothing
+safeMinimum xs = Just (minimum xs)
+
+add :: Maybe Int -> Maybe Int -> Int
+add Nothing Nothing = 0
+add Nothing (Just n) = n
+add (Just m) Nothing = m
+add (Just m) (Just n) = m + n
+
+add' :: Maybe Int -> Maybe Int -> Maybe Int
+add' Nothing Nothing = Nothing
+add' Nothing (Just n) = Nothing
+add' (Just m) Nothing = Nothing
+add' (Just m) (Just n) = Just (m + n)
