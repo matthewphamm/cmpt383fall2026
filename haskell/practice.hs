@@ -1,4 +1,3 @@
-import Distribution.Simple.Utils (xargs)
 -- practice.hs
 --
 -- Practice problems for the CMPT 383 Haskell quiz. They are similar in style
