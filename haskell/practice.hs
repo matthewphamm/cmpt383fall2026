@@ -1,3 +1,4 @@
+import Distribution.Simple.Utils (xargs)
 -- practice.hs
 --
 -- Practice problems for the CMPT 383 Haskell quiz. They are similar in style
@@ -29,24 +30,32 @@
 -- undefined. Don't use the standard maximum or max functions.
 -- e.g. mymaximum [3,8,2,5] = 8
 mymaximum :: Ord a => [a] -> a
-mymaximum = undefined
+mymaximum [] = undefined
+mymaximum [x] = x
+mymaximum (x:xs) = if x > m then x else m
+                   where m = mymaximum xs
 
 -- 2. returns the number of times x appears in a list
 -- e.g. count 'a' "banana" = 3, count 5 [1,2,3] = 0
 count :: Eq a => a -> [a] -> Int
-count = undefined
+count _ [] = 0
+count x (first:rest) | x == first = 1 + count x rest
+                     | otherwise  = count x rest
 
 -- 3. returns True if x is in the list, and False otherwise. Don't use the
 -- standard elem function.
 -- e.g. myelem 3 [1,2,3] = True, myelem 'z' "cat" = False
 myelem :: Eq a => a -> [a] -> Bool
-myelem = undefined
+myelem _ [] = False
+myelem x (first:rest) = x == first || myelem x rest
 
 -- 4. your own version of take: returns the first n elements of a list. If n is
 -- bigger than the length of the list, the whole list is returned.
 -- e.g. mytake 2 [5,6,7] = [5,6], mytake 10 "hi" = "hi"
 mytake :: Int -> [a] -> [a]
-mytake = undefined
+mytake _ [] = []
+mytake n (x:xs) | n <= 0    = []
+                | otherwise = x : mytake (n - 1) xs
 
 -- 5. your own version of zip
 -- e.g. myzip [1,2,3] "ab" = [(1,'a'),(2,'b')]

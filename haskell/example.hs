@@ -323,11 +323,15 @@ area (Rect w h) = w * h
 -- first = head
 -- This is not safe as when you input an empty list it will crash
 
+-- Maybe a is a pre-defined data type that represents a value that may or may not
+-- exist
+-- data Maybe a - Nothing | Just a
+
 safeFirst :: [a] -> Maybe a
 safeFirst []   = Nothing
 safeFirst(x:_) = Just x
 
--- call to safeFirst "cat" returns Just 'c' or call to safeFirst [] returns Nothing
+-- call to safeFirst "cat" returns "Just 'c'" or call to safeFirst [] returns Nothing
 
 safeMinimum :: Ord a => [a] -> Maybe a
 safeMinimum [] = Nothing

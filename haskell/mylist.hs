@@ -4,38 +4,66 @@
 data List a = Nil | Cons a (List a)
     deriving (Eq, Show)
 
-lst1 = Cons 5 (Cons 2 (Cons 6 Nil))
-lst2 = Cons "cat" (Cons "dog" (Cons "bird" (Cons "cow" Nil)))
+nums :: List Int
+nums = Cons 5 (Cons 2 (Cons 6 Nil))
 
--- TODO 1: get the first element of a list
+names :: List String
+names = Cons "cat" (Cons "dog" (Cons "bird" (Cons "cow" Nil)))
+
+-- get the first element of a list
 first :: List a -> a
-first Nil        = error "first: Nil list"
+first Nil        = undefined
 first (Cons x _) = x
 
--- TODO 2: get the rest of a mylist
+-- get the rest of a mylist
 rest :: List a -> List a
-rest Nil         = Nil
+rest Nil         = undefined
 rest (Cons _ xs) = xs
 
--- TODO 3: get the length of a mylist
+-- get the length of a mylist
 len :: List a -> Int
 len Nil         = 0
 len (Cons x xs) = 1 + len xs
 
--- TODO 4: convert a regular Haskell list to a mylist
+-- mysum lst returns the sum of a List of Ints
+mysum :: List Int -> Int
+mysum Nil         = 0
+mysum (Cons x xs) = x + mysum xs
+
+-- mymap f lst returns a new List with f applied to each element of lst
+mymap :: (a -> b) -> List a -> List b
+mymap _ Nil         = Nil
+mymap f (Cons x xs) = Cons (f x) (mymap f xs)
+
+-- toString lst converts a List to a String in a simple way (could be improved)
+-- basically the show call
+
+toString :: (Show a, Eq a) => List a -> String
+toString Nil         = ""
+-- toString (Cons x xs) = show x ++ " " ++ toString xs
+toString (Cons x xs) | len xs == 0 = show x
+                     | otherwise   = show x ++ ", " ++ toString xs
+
+-- convert a regular Haskell list to a mylist
 to_List :: [a] -> List a
 to_List = foldr Cons Nil
 
--- TODO 5: convert a mylist to a regular Haskell list (using recursion)
+-- convert a mylist to a regular Haskell list (using recursion)
 to_hlist :: List a -> [a]
 to_hlist Nil         = []
 to_hlist (Cons x xs) = x : (to_hlist xs)
 
--- TODO 6: fold right for a mylist
+-- old right for a mylist
 foldright :: (a -> b -> b) -> b -> List a -> b
 foldright _  init Nil         = init
 foldright op init (Cons x xs) = x `op` (foldright op init xs)
 
--- TODO 7: convert a mylist to a regular Haskell list (using fold right)
+-- convert a mylist to a regular Haskell list (using fold right)
 to_hlist' :: List a -> [a]
 to_hlist' = foldright (:) []
+
+-- write filter as a List
+myfilter :: (a -> Bool) -> List a -> List a
+myfilter _ Nil         = Nil
+myfilter f (Cons x xs) | f x       = Cons x (myfilter f xs)
+                       | otherwise = myfilter f xs

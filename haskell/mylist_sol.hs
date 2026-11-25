@@ -7,7 +7,7 @@ lst1 = Cons 5 (Cons 2 (Cons 6 Nil))
 lst2 = Cons "cat" (Cons "dog" (Cons "bird" (Cons "cow" Nil)))
 
 -- get the first element of a list
-first :: List a -> a24tennis
+first :: List a -> a
 first Nil        = error "first: empty list"
 first (Cons x _) = x
 
