@@ -172,7 +172,7 @@ thrice f = f . f . f
 -- 16. makeMultiplier n returns a function that multiplies its input by n
 -- e.g. (makeMultiplier 3) 5 = 15, map (makeMultiplier 10) [1,2,3] = [10,20,30]
 makeMultiplier :: Int -> (Int -> Int)
-makeMultiplier = undefined
+makeMultiplier n = (* n)
 
 -- 17. your own version of filter, using plain recursion
 -- e.g. myfilter even [1,2,3,4] = [2,4]
