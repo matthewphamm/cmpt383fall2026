@@ -246,8 +246,10 @@ sumDoubledEvens = sum . map (* 2) . filter even
 -- Include the most general type signature.
 -- e.g. isSorted [1,2,2,5] = True, isSorted "cab" = False
 
--- isSorted :: ??
-isSorted xs = undefined
+isSorted :: Ord a => [a] -> Bool
+isSorted []       = True
+isSorted [_]      = True
+isSorted (x:y:ys) = x <= y && isSorted (y:ys)
 
 -- 23. merge two sorted lists into one sorted list
 -- e.g. merge [1,4,7] [2,3,9] = [1,2,3,4,7,9]
