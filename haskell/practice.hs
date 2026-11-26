@@ -113,10 +113,10 @@ myhead (x:_) = x
 -- otherwise n as a string (use show). Use guarded equations.
 -- e.g. fizzbuzz 9 = "Fizz", fizzbuzz 30 = "FizzBuzz", fizzbuzz 7 = "7"
 fizzbuzz :: Int -> String
-fizzbuzz n | n `mod` 3 == n `mod` 5           = "FizzBuzz"
-           | n `mod` 3 == 0 && n `mod` 5 /= 0 = "Fizz"
-           | n `mod` 3 /= 0 && n `mod` 5 == 0 = "Buzz"
-           | otherwise                        = show n
+fizzbuzz n | n `mod` 15 == 0 = "FizzBuzz"
+           | n `mod` 3 == 0  = "Fizz"
+           | n `mod` 5 == 0  = "Buzz"
+           | otherwise       = show n
 
 -- 11. the opposite of pluralize from example.hs: if the string ends with 's',
 -- remove that 's'; otherwise return it unchanged. The singular of the empty
