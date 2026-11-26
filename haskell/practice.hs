@@ -177,7 +177,9 @@ makeMultiplier n = (* n)
 -- 17. your own version of filter, using plain recursion
 -- e.g. myfilter even [1,2,3,4] = [2,4]
 myfilter :: (a -> Bool) -> [a] -> [a]
-myfilter = undefined
+myfilter pred [] = []
+myfilter pred (x:xs) | pred x    = x : myfilter pred xs
+                     | otherwise = myfilter pred xs
 
 -- 18. your own versions of all and any, using plain recursion
 -- e.g. myall even [2,4,6] = True, myany odd [2,4,6] = False
