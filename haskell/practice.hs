@@ -156,10 +156,10 @@ isNegative :: Int -> Bool
 isNegative = \x -> x < 0
 
 double' :: Int -> Int
-double' = undefined
+double' = (* 2) 
 
 isNegative' :: Int -> Bool
-isNegative' = undefined
+isNegative' = (< 0)
 
 -- 15. thrice f x applies f to x three times, i.e. thrice f x = f (f (f x)).
 -- Write it using function composition, like twice in example.hs, and give
