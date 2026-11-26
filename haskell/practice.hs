@@ -197,7 +197,8 @@ myany pred (x:xs) = pred x || myany pred xs
 type Predicate a = a -> Bool
 
 countIf :: Predicate a -> [a] -> Int
-countIf = undefined
+countIf p [] = 0
+countIf p lst = length (filter p lst)
 
 -- 20. Implement each of these using foldr (no explicit recursion):
 --   mysum' xs     -- same as mysum
