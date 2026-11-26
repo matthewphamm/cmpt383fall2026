@@ -286,28 +286,30 @@ quicksortDesc (pivot:rest) = (quicksortDesc bigs) ++ [pivot] ++ (quicksortDesc s
 -- write firstNEvens n, which returns the first n even numbers.
 -- e.g. firstNEvens 4 = [0,2,4,6]
 evens :: [Int]
-evens = undefined
+evens = filter even [0..]
 
 firstNEvens :: Int -> [Int]
-firstNEvens = undefined
+firstNEvens n = take n evens
 
 -- 27. squaresLessThan n returns all the perfect squares 1, 4, 9, ... that are
 -- less than n. Use an infinite list.
 -- e.g. squaresLessThan 50 = [1,4,9,16,25,36,49]
 squaresLessThan :: Int -> [Int]
-squaresLessThan = undefined
+squaresLessThan n = takeWhile (< n) (map (^ 2) [1..])
 
 -- 28. Define powersOf2 to be the infinite list [1,2,4,8,16,...]
 -- e.g. take 5 powersOf2 = [1,2,4,8,16]
 powersOf2 :: [Integer]
-powersOf2 = undefined
+powersOf2 = map (2 ^) [0..]
 
 -- 29. Similar to bools/bits in example.hs: ternary n returns all strings of
 -- length n made from the characters '0', '1', and '2', in order.
 -- e.g. ternary 2 = ["00","01","02","10","11","12","20","21","22"]
 --      length (ternary 5) = 243
 ternary :: Int -> [String]
-ternary = undefined
+ternary 0 = [[]]
+ternary n = map ('0':) bs ++ map ('1':) bs ++ map ('2':) bs
+          where bs = ternary (n - 1)
 
 -- 30. divisors n returns all the positive numbers less than n that divide
 -- evenly into n. A number is *perfect* if it equals the sum of its divisors.
@@ -316,13 +318,13 @@ ternary = undefined
 -- e.g. divisors 12 = [1,2,3,4,6], isPerfect 28 = True, take 3 perfects =
 -- [6,28,496]
 divisors :: Int -> [Int]
-divisors = undefined
+divisors n = takeWhile (< n) (filter (\d -> n `mod` d == 0) [1..])
 
 isPerfect :: Int -> Bool
-isPerfect = undefined
+isPerfect n = n > 0 && n == sum (divisors n)
 
 perfects :: [Int]
-perfects = undefined
+perfects = filter isPerfect [1..]
 
 -- 31. Using isPrime and primes from example.hs (copied below), write goldbach
 -- n, which returns the first pair of primes (p, q) with p <= q and p + q == n.
@@ -337,8 +339,9 @@ isPrime n = n > 1 && all nonDivisor candidates
 primes :: [Int]
 primes = filter isPrime [2..]
 
+-- look at this question more in depth , kind of confusing might be on quiz
 goldbach :: Int -> (Int, Int)
-goldbach = undefined
+goldbach n = undefined
 
 ---------------------------------------------------------------------------
 -- Part 6: Data types and Maybe
