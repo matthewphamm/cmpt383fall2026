@@ -59,7 +59,9 @@ mytake n (x:xs) | n <= 0    = []
 -- 5. your own version of zip
 -- e.g. myzip [1,2,3] "ab" = [(1,'a'),(2,'b')]
 myzip :: [a] -> [b] -> [(a, b)]
-myzip = undefined
+myzip _ [] = []
+myzip [] _ = []
+myzip (x:xs) (y:ys) = (x,y) : myzip xs ys
 
 -- 6. returns every other element of a list, starting with the first
 -- e.g. everyOther [1,2,3,4,5] = [1,3,5], everyOther "abcdef" = "ace"
