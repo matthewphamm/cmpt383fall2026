@@ -66,7 +66,9 @@ myzip (x:xs) (y:ys) = (x,y) : myzip xs ys
 -- 6. returns every other element of a list, starting with the first
 -- e.g. everyOther [1,2,3,4,5] = [1,3,5], everyOther "abcdef" = "ace"
 everyOther :: [a] -> [a]
-everyOther = undefined
+everyOther [] = []
+everyOther [x] = [x]
+everyOther (x:_:xs) = x : everyOther xs
 
 -- 7. your own version of ++, i.e. myappend xs ys = xs ++ ys. Don't use ++.
 -- e.g. myappend [1,2] [3,4,5] = [1,2,3,4,5]
