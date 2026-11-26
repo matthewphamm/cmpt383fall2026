@@ -73,23 +73,36 @@ everyOther (x:_:xs) = x : everyOther xs
 -- 7. your own version of ++, i.e. myappend xs ys = xs ++ ys. Don't use ++.
 -- e.g. myappend [1,2] [3,4,5] = [1,2,3,4,5]
 myappend :: [a] -> [a] -> [a]
-myappend = undefined
+-- myappend [] []  = []
+-- myappend [x] [] = [x]
+-- myappend [] [y] = [y]
+-- myappend xs ys  = concat [xs,ys]
+myappend [] ys     = ys
+myappend (x:xs) ys = x : myappend xs ys 
 
 -- 8. returns True if a list is the same forwards and backwards
 -- e.g. isPalindrome "racecar" = True, isPalindrome [1,2] = False
 isPalindrome :: Eq a => [a] -> Bool
-isPalindrome = undefined
+isPalindrome [] = True
+isPalindrome lst | reverse lst == lst = True
+                 | otherwise         = False
 
 -- 9. swaps the first and last elements of a list. Lists with 0 or 1 elements
 -- are returned unchanged. Hint: middle from example.hs might help.
 -- e.g. swapEnds [1,2,3,4] = [4,2,3,1], swapEnds "a" = "a"
 swapEnds :: [a] -> [a]
-swapEnds = undefined
+swapEnds []      = []
+swapEnds [first] = [first]
+swapEnds lst     = [last lst] ++ middle lst ++ [myhead lst]
 
 -- middle, as in example.hs
 middle :: [a] -> [a]
 middle []     = []
 middle (_:xs) = init xs
+
+myhead :: [a] -> a
+myhead []    = undefined
+myhead (x:_) = x
 
 ---------------------------------------------------------------------------
 -- Part 2: Guards, if-then-else, and pattern matching
