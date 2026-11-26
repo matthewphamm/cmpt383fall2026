@@ -254,18 +254,29 @@ isSorted (x:y:ys) = x <= y && isSorted (y:ys)
 -- 23. merge two sorted lists into one sorted list
 -- e.g. merge [1,4,7] [2,3,9] = [1,2,3,4,7,9]
 merge :: Ord a => [a] -> [a] -> [a]
-merge = undefined
+merge [] ys         = ys
+merge xs []         = xs
+merge (x:xs) (y:ys) | x <= y    = x : merge xs (y:ys)
+                    | otherwise = y : merge (x:xs) ys
 
 -- 24. Implement mergesort using merge. Split the list in half using take,
 -- drop, and length.
 -- e.g. mergesort [5,2,8,1,9] = [1,2,5,8,9]
 mergesort :: Ord a => [a] -> [a]
-mergesort = undefined
+mergesort []  = []
+mergesort [x] = [x]
+mergesort lst = merge (mergesort x) (mergesort y)
+              where half = length lst `div` 2
+                    x    = take half lst
+                    y    = drop half lst
 
 -- 25. Modify quicksort from example.hs so that it sorts in *descending* order
 -- e.g. quicksortDesc [3,1,4,1,5] = [5,4,3,1,1]
 quicksortDesc :: Ord a => [a] -> [a]
-quicksortDesc = undefined
+quicksortDesc []           = []
+quicksortDesc (pivot:rest) = (quicksortDesc bigs) ++ [pivot] ++ (quicksortDesc smalls)
+                           where bigs   = filter (> pivot) rest
+                                 smalls = filter (<= pivot) rest
 
 ---------------------------------------------------------------------------
 -- Part 5: Lazy evaluation and infinite lists
