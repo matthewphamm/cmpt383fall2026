@@ -123,6 +123,7 @@ fizzbuzz n | n `mod` 15 == 0 = "FizzBuzz"
 -- string is the empty string.
 -- e.g. singularize "cats" = "cat", singularize "dog" = "dog"
 singularize :: String -> String
+singularize "" = ""
 singularize string | last string == 's' = init string
                    | otherwise          = string
 
@@ -137,7 +138,7 @@ myor _ _         = True
 -- guarded equations, and give the most general type signature.
 -- e.g. clamp 0 10 5 = 5, clamp 0 10 (-3) = 0, clamp 0 10 99 = 10
 
-clamp :: Int -> Int -> Int -> Int
+clamp :: Ord a => a -> a -> a -> a
 clamp lo hi x | lo <= x && x <= hi = x
               | x < lo             = lo
               | otherwise          = hi
