@@ -166,8 +166,8 @@ isNegative' = (< 0)
 -- its most general type.
 -- e.g. thrice (+1) 0 = 3, thrice tail "haskell" = "kell"
 
--- thrice :: ??
-thrice f = undefined
+thrice :: (a -> a) -> a -> a 
+thrice f = f . f . f
 
 -- 16. makeMultiplier n returns a function that multiplies its input by n
 -- e.g. (makeMultiplier 3) 5 = 15, map (makeMultiplier 10) [1,2,3] = [10,20,30]
