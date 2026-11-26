@@ -205,17 +205,18 @@ countIf p lst = length (filter p lst)
 --   mylength' xs  -- same as mylength
 --   mymap' f xs   -- same as map f xs
 --   myreverse' xs -- same as reverse xs
+-- foldr op init lst
 mysum' :: Num a => [a] -> a
-mysum' = undefined
+mysum' xs = foldr (+) 0 xs
 
 mylength' :: [a] -> Int
-mylength' = undefined
+mylength' xs = foldr (\_ acc -> 1 + acc) 0 xs
 
 mymap' :: (a -> b) -> [a] -> [b]
-mymap' = undefined
+mymap' f xs = foldr (\x acc -> f x : acc) [] xs
 
 myreverse' :: [a] -> [a]
-myreverse' = undefined
+myreverse' xs = foldr (\x acc -> acc ++ [x]) [] xs
 
 -- 21. Write these as one-line *point-free* functions using composition (.):
 --
@@ -229,13 +230,13 @@ myreverse' = undefined
 --   sumDoubledEvens lst doubles each even number in lst and returns the sum
 --   e.g. sumDoubledEvens [1,2,3,4] = 12
 countEvens :: [Int] -> Int
-countEvens = undefined
+countEvens = length . filter even 
 
 countLongWords :: [String] -> Int
-countLongWords = undefined
+countLongWords = length . filter (\x -> length x > 3)
 
 sumDoubledEvens :: [Int] -> Int
-sumDoubledEvens = undefined
+sumDoubledEvens = sum . map (* 2) . filter even
 
 ---------------------------------------------------------------------------
 -- Part 4: Sorting
