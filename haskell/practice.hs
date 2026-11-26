@@ -113,27 +113,34 @@ myhead (x:_) = x
 -- otherwise n as a string (use show). Use guarded equations.
 -- e.g. fizzbuzz 9 = "Fizz", fizzbuzz 30 = "FizzBuzz", fizzbuzz 7 = "7"
 fizzbuzz :: Int -> String
-fizzbuzz = undefined
+fizzbuzz n | n `mod` 3 == n `mod` 5           = "FizzBuzz"
+           | n `mod` 3 == 0 && n `mod` 5 /= 0 = "Fizz"
+           | n `mod` 3 /= 0 && n `mod` 5 == 0 = "Buzz"
+           | otherwise                        = show n
 
 -- 11. the opposite of pluralize from example.hs: if the string ends with 's',
 -- remove that 's'; otherwise return it unchanged. The singular of the empty
 -- string is the empty string.
 -- e.g. singularize "cats" = "cat", singularize "dog" = "dog"
 singularize :: String -> String
-singularize = undefined
+singularize string | last string == 's' = init string
+                   | otherwise          = string
 
 -- 12. your own version of the || operator, similar to myand in example.hs. Use
 -- pattern matching, and only *two* equations.
-myor :: Bool -> Bool -> Bool
-myor = undefined
+myor :: Bool -> Bool -> Bool 
+myor False False = False
+myor _ _         = True
 
 -- 13. clamp lo hi x returns x if it's in the range lo to hi (inclusive);
 -- otherwise it returns lo if x is too small, or hi if x is too big. Use
 -- guarded equations, and give the most general type signature.
 -- e.g. clamp 0 10 5 = 5, clamp 0 10 (-3) = 0, clamp 0 10 99 = 10
 
--- clamp :: ??
-clamp lo hi x = undefined
+clamp :: Int -> Int -> Int -> Int
+clamp lo hi x | lo <= x && x <= hi = x
+              | x < lo             = lo
+              | otherwise          = hi
 
 ---------------------------------------------------------------------------
 -- Part 3: Lambdas, sections, and higher-order functions
