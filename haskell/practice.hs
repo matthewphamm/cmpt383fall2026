@@ -426,6 +426,27 @@ sumMaybes (Just n : xs)  = n + sumMaybes xs
 --   f. ((+ 1) . (* 2)) 5
 --   g. foldr (-) 0 [1,2,3]
 
+{-
+37. Answers
+      a. [1,3,5,7,9] * 2 on each element in that list, so, this evaluates to [2,6,10,14,18]
+      b. takeWhile is an expression where it takes elements till the pred evalutes to false
+           so, the pred for this expression is that elements have to be less than 10 (< 10)
+           but need to evaluate map (^ 2) [1..] first, which means map the squared function to the 
+           infinite list from 1 to infinity, so [1,4,9, ..] but the takeWhile expression only wants
+           values that are less than 10 so the final expression is [1,4,9]
+      c. dropWhile is an expression where it drops elements that are true to the pred and stops dropping once its false
+           so, the final expression is [5,6,8] 
+      d. So for this twice does the function twice, in this case does tail twice on the list of strings "haskell"
+           but what does tail do? it removes the first element in the list, so it removes the first two elements
+           final expression is, "skell"
+      e. combine the two list into pairs, so combine "abc" to the infinite list starting from 1 but only do the
+           first three elements since "abc" has only 3 elements (lazy evaluation), final expression is 
+           [('a',1), ('b',2), ('c',3)]
+      f. composition expression here so do the right most expression first, in this case (* 2) then (+ 1) on 5
+           final answer, is (5 * 2) + 1 = 11
+      g. (1 - ( 2 - (3 - 0))) = (1 - (2 - 3)) = (1 - (-1)) = 1 + 1 = 2
+-}
+
 -- 38. Give the most general type of each of the following. Work it out
 -- yourself before checking with :type in GHCi.
 --
@@ -434,6 +455,15 @@ sumMaybes (Just n : xs)  = n + sumMaybes xs
 --   c. map fst
 --   d. zip
 --   e. (True, "x", 'x')
+
+{-
+38. Answers
+      a. (++) :: [a] -> [a] -> [a]
+      b. \x -> [x] :: a -> [a]
+      c. map fst :: (a, b) -> [a]
+      d. zip :: [a] -> [b] -> [(a, b)]
+      e. (True, "x", 'x') -> (Bool, String, Char) -- String is a [Char] (list of characters)
+-}
 
 -- 39. Explain what's wrong with each of these, and how to fix it:
 --
@@ -447,3 +477,20 @@ sumMaybes (Just n : xs)  = n + sumMaybes xs
 --   c. myinit :: [a] -> [a]
 --      myinit []     = []
 --      myinit (x:xs) = x : myinit xs
+
+{-
+39. Answers
+      a. mylength has type a where a is any type but must be a list and its input is a list, where its 
+         return value is an integer. What's wrong with it? the recursive call on line 472 has an input of 1 value (x)
+         instead of the rest of the list (xs). I believe it will give an error as well because of the different types
+         Solution: mylength (x:xs) = 1 + mylength xs
+      b. isEven has type Int and its input takes an integer and returns a boolean expression (Bool). 
+         What's wrong with it? there is no backticks on the mod this will cause an error and theres no else statement meaning if it is False
+         there would be no expression to signify it was False
+         Solution: isEven n = if n `mod` 2 == 0 then True else False maybe no if needed at all
+         Solution: isEven n = n `mod` 2 == 0
+      c. myinit has type a where a is any type but must be a list and its input is a list, where its return value is 
+         a list. What's wrong with it? it just returns the entire list given in the input instead of the last element removed
+         Solution: on line 478 it should be myinit [x] = [], this will remove the last element and there should be the case
+         of an empty list where it could be undefined
+-}
