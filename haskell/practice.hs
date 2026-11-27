@@ -355,16 +355,23 @@ goldbach n = undefined
 --
 -- (Uncomment these lines once you've declared Direction.)
 
--- data Direction = ??
+data Direction = North | East | South | West  
+  deriving (Show, Eq)
 
--- turnRight :: Direction -> Direction
--- turnRight = undefined
+turnRight :: Direction -> Direction
+turnRight North = East
+turnRight East  = South
+turnRight South = West
+turnRight West  = North
 
--- turnLeft :: Direction -> Direction
--- turnLeft = undefined
+turnLeft :: Direction -> Direction
+turnLeft North = West
+turnLeft West  = South
+turnLeft South = East
+turnLeft East  = North
 
--- opposite :: Direction -> Direction
--- opposite = undefined
+opposite :: Direction -> Direction
+opposite = turnRight . turnRight
 
 -- 33. Using the Shape type from example.hs (copied below), write perimeter,
 -- and totalArea, which returns the sum of the areas of a list of shapes.
@@ -377,26 +384,33 @@ area (Circle r) = pi * r ^ 2
 area (Rect w h) = w * h
 
 perimeter :: Shape -> Float
-perimeter = undefined
+perimeter (Circle r) = 2 * pi * r
+perimeter (Rect w h) = 2 * (w + h)
 
 totalArea :: [Shape] -> Float
-totalArea = undefined
+totalArea shapes = sum (map area shapes)
 
 -- 34. safeLast returns Nothing for an empty list, and Just the last element
 -- otherwise.
 -- e.g. safeLast [1,2,3] = Just 3, safeLast "" = Nothing
 safeLast :: [a] -> Maybe a
-safeLast = undefined
+safeLast []     = Nothing
+safeLast [x]    = Just x
+safeLast (_:xs) = safeLast xs
 
 -- 35. safeDiv m n returns Nothing if n is 0, and Just (m `div` n) otherwise
 -- e.g. safeDiv 7 2 = Just 3, safeDiv 7 0 = Nothing
 safeDiv :: Int -> Int -> Maybe Int
-safeDiv = undefined
+safeDiv m n | n == 0    = Nothing
+            | otherwise = Just (m `div` n)
+
 
 -- 36. sumMaybes adds up all the Just values in a list, ignoring the Nothings
 -- e.g. sumMaybes [Just 3, Nothing, Just 4] = 7, sumMaybes [] = 0
 sumMaybes :: [Maybe Int] -> Int
-sumMaybes = undefined
+sumMaybes []             = 0
+sumMaybes (Nothing : xs) = sumMaybes xs
+sumMaybes (Just n : xs)  = n + sumMaybes xs
 
 ---------------------------------------------------------------------------
 -- Part 7: No coding: predict, explain, and work out types
